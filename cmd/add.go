@@ -23,33 +23,46 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/bdazl/note/db"
 	"github.com/spf13/cobra"
 )
 
-func noteRoot(cmd *cobra.Command, args []string) {
-
-}
-
-func noteList(cmd *cobra.Command, args []string) {
+func noteAdd(cmd *cobra.Command, args []string) {
 	d, err := db.Open(storagePath)
 	if err != nil {
 		panic(err)
 	}
 
-	notes, err := db.ListNotes(d, db.ColumnCreatedAt, false, 0, 0)
+	add := db.Note{
+		Title:      emptyToNil(&title),
+		Tags:       emptyToNil(&tags),
+		Note:       argsToNote(args),
+		IsFavorite: favorite,
+	}
+
+	id, err := db.AddNote(d, add, false)
 	if err != nil {
 		panic(err)
 	}
 
-	for _, n := range notes {
-		if n.Title != nil && *n.Title != "" {
-			fmt.Printf("%v: ", *n.Title)
-		}
-		fmt.Println(n.Note)
-	}
+	fmt.Println(id)
 }
 
-func list() {
+func argsToNote(args []string) string {
+	if len(args) == 0 {
+		// TODO: Open $EDITOR
+		fmt.Fprintln(os.Stderr, "no note value provided")
+		os.Exit(1)
+	}
+	return strings.Join(args, separator)
+}
+
+func emptyToNil(s *string) *string {
+	if s == nil || *s == "" {
+		return nil
+	}
+	return s
 }

@@ -26,6 +26,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/bdazl/note/db"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -36,7 +37,7 @@ var (
 	rootCmd = &cobra.Command{
 		Use:   "note",
 		Short: "No fuzz terminal note taking",
-		Run:   list, // list notes per default
+		Run:   noteRoot,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			currentCmd = cmd
 			initConfig()
@@ -45,27 +46,36 @@ var (
 	initCmd = &cobra.Command{
 		Use:   "init",
 		Short: "Initialize note configuration",
-		Run:   noteInit, // list notes per default
+		Run:   noteInit,
 	}
 	addCmd = &cobra.Command{
-		Use:     "add",
+		Use:     "add note [notes...]",
 		Aliases: []string{"a"},
 		Short:   "Add a new note",
-		Run:     list, // list notes per default
+		Run:     noteAdd,
 	}
 	listCmd = &cobra.Command{
 		Use:     "list",
 		Aliases: []string{"ls"},
 		Short:   "Prints some or all of your notes",
-		Run:     list, // list notes per default
+		Run:     noteList,
 	}
 )
 
 // Command line argument values
 var (
+	// Global arguments
 	configPath  string
 	storagePath string
-	force       bool
+
+	// Init argument
+	force bool
+
+	// Add arguments
+	title     string
+	tags      string
+	separator string
+	favorite  bool
 )
 
 func Execute() {
@@ -86,11 +96,17 @@ func init() {
 	}
 
 	globalFlags := rootCmd.PersistentFlags()
-	globalFlags.StringVar(&configPath, "config", dfltConfig, "config file")
-	globalFlags.StringVar(&storagePath, "store", dfltStore, "database store containing your notes")
+	globalFlags.StringVarP(&configPath, "config", "c", dfltConfig, "config file")
+	globalFlags.StringVarP(&storagePath, "store", "d", dfltStore, "database store containing your notes")
 
 	initFlags := initCmd.Flags()
 	initFlags.BoolVar(&force, "force", false, "determines if existing files will be overwritten")
+
+	addFlags := addCmd.Flags()
+	addFlags.StringVarP(&title, "name", "n", "", "title of note (optional)")
+	addFlags.StringVarP(&tags, "tags", "t", "", "tags of note as a comma separated string (optional)")
+	addFlags.StringVarP(&separator, "separator", "s", " ", "concatenate positional arguments with this separator")
+	addFlags.BoolVarP(&favorite, "favorite", "f", false, "mark note as favorite")
 
 	rootCmd.AddCommand(initCmd, addCmd, listCmd)
 }
@@ -117,7 +133,9 @@ func noteInit(cmd *cobra.Command, args []string) {
 		forceInform = true
 	} else {
 		fmt.Printf("Create initial db: %v\n", storagePath)
-		// TODO: create storage
+		if err := db.CreateDb(storagePath); err != nil {
+			panic(err)
+		}
 	}
 
 	if forceInform {
