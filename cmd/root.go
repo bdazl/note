@@ -72,10 +72,10 @@ var (
 	force bool
 
 	// Add arguments
-	title     string
-	tags      string
-	separator string
-	favorite  bool
+	title    string
+	tags     string
+	newline  bool
+	favorite bool
 )
 
 func Execute() {
@@ -105,7 +105,7 @@ func init() {
 	addFlags := addCmd.Flags()
 	addFlags.StringVarP(&title, "name", "n", "", "title of note (optional)")
 	addFlags.StringVarP(&tags, "tags", "t", "", "tags of note as a comma separated string (optional)")
-	addFlags.StringVarP(&separator, "separator", "s", " ", "concatenate positional arguments with this separator")
+	addFlags.StringVarP(&newline, "newline", "l", " ", "concatenate positional arguments with newline, instead of spaces")
 	addFlags.BoolVarP(&favorite, "favorite", "f", false, "mark note as favorite")
 
 	rootCmd.AddCommand(initCmd, addCmd, listCmd)

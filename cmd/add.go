@@ -57,7 +57,12 @@ func argsToNote(args []string) string {
 		fmt.Fprintln(os.Stderr, "no note value provided")
 		os.Exit(1)
 	}
-	return strings.Join(args, separator)
+
+	sep := " "
+	if newline {
+		sep = "\n"
+	}
+	return strings.Join(args, sep)
 }
 
 func emptyToNil(s *string) *string {
