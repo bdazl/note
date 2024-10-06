@@ -22,47 +22,93 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
+var (
+	currentCmd *cobra.Command
 
+	rootCmd = &cobra.Command{
+		Use:   "note",
+		Short: "No fuzz terminal note taking",
+		Run:   list, // list notes per default
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			currentCmd = cmd
+			initConfig()
+		},
+	}
+	initCmd = &cobra.Command{
+		Use:   "init",
+		Short: "Initialize note configuration",
+		Run:   noteInit, // list notes per default
+	}
+	addCmd = &cobra.Command{
+		Use:     "add",
+		Aliases: []string{"a"},
+		Short:   "Add a new note",
+		Run:     list, // list notes per default
+	}
+	listCmd = &cobra.Command{
+		Use:     "list",
+		Aliases: []string{"ls"},
+		Short:   "Prints some or all of your notes",
+		Run:     list, // list notes per default
+	}
+)
 
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
-	Use:   "note",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+// Command line argument values
+var (
+	configPath  string
+	storagePath string
+)
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
-}
-
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	err := rootCmd.Execute()
-	if err != nil {
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v", err.Error())
 		os.Exit(1)
 	}
 }
 
 func init() {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
+	dfltConfig, err := defaultConfigPath()
+	if err != nil {
+		panic(err)
+	}
+	dfltStore, err := defaultStoragePath()
+	if err != nil {
+		panic(err)
+	}
 
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.note.yaml)")
+	pflags := rootCmd.PersistentFlags()
+	pflags.StringVar(&configPath, "config", dfltConfig, "config file")
+	pflags.StringVar(&storagePath, "store", dfltStore, "database store containing your notes")
 
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.AddCommand(initCmd, addCmd, listCmd)
 }
 
+func noteInit(cmd *cobra.Command, args []string) {
+	fmt.Printf("Writing config file: %v\n", configPath)
 
+	mkdir(filepath.Dir(configPath))
+	err := viper.WriteConfig()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("Create initial db: %v\n", storagePath)
+
+	mkdir(filepath.Dir(storagePath))
+	// TODO: create storage
+}
+
+func mkdir(path string) {
+	err := os.MkdirAll(path, os.ModePerm)
+	if err != nil {
+		panic(err)
+	}
+}
