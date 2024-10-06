@@ -65,6 +65,7 @@ var (
 var (
 	configPath  string
 	storagePath string
+	force       bool
 )
 
 func Execute() {
@@ -84,26 +85,46 @@ func init() {
 		panic(err)
 	}
 
-	pflags := rootCmd.PersistentFlags()
-	pflags.StringVar(&configPath, "config", dfltConfig, "config file")
-	pflags.StringVar(&storagePath, "store", dfltStore, "database store containing your notes")
+	globalFlags := rootCmd.PersistentFlags()
+	globalFlags.StringVar(&configPath, "config", dfltConfig, "config file")
+	globalFlags.StringVar(&storagePath, "store", dfltStore, "database store containing your notes")
+
+	initFlags := initCmd.Flags()
+	initFlags.BoolVar(&force, "force", false, "determines if existing files will be overwritten")
 
 	rootCmd.AddCommand(initCmd, addCmd, listCmd)
 }
 
 func noteInit(cmd *cobra.Command, args []string) {
-	fmt.Printf("Writing config file: %v\n", configPath)
+	forceInform := false
 
 	mkdir(filepath.Dir(configPath))
-	err := viper.WriteConfig()
-	if err != nil {
-		panic(err)
+	mkdir(filepath.Dir(storagePath))
+
+	if !force && exists(configPath) {
+		fmt.Fprintln(os.Stderr, "Config file already exists")
+		forceInform = true
+	} else {
+		fmt.Printf("Writing config file: %v\n", configPath)
+		err := viper.WriteConfig()
+		if err != nil {
+			panic(err)
+		}
 	}
 
-	fmt.Printf("Create initial db: %v\n", storagePath)
+	if !force && exists(storagePath) {
+		fmt.Fprintln(os.Stderr, "Storage file already exists")
+		forceInform = true
+	} else {
+		fmt.Printf("Create initial db: %v\n", storagePath)
+		// TODO: create storage
+	}
 
-	mkdir(filepath.Dir(storagePath))
-	// TODO: create storage
+	if forceInform {
+		fmt.Println()
+		fmt.Fprintln(os.Stderr, "Some file(s) where not initialized")
+		fmt.Fprintln(os.Stderr, "If you want to force re-create them, consider using the --force flag")
+	}
 }
 
 func mkdir(path string) {
@@ -111,4 +132,12 @@ func mkdir(path string) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func exists(path string) bool {
+	_, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return err == nil
 }
