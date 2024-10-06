@@ -29,20 +29,14 @@ import (
 )
 
 func noteRoot(cmd *cobra.Command, args []string) {
-
+	pprintNotes(list(10, 0))
 }
 
 func noteList(cmd *cobra.Command, args []string) {
-	d, err := db.Open(storagePath)
-	if err != nil {
-		panic(err)
-	}
+	pprintNotes(list(0, 0))
+}
 
-	notes, err := db.ListNotes(d, db.ColumnCreatedAt, false, 0, 0)
-	if err != nil {
-		panic(err)
-	}
-
+func pprintNotes(notes []db.Note) {
 	for _, n := range notes {
 		if n.Title != nil && *n.Title != "" {
 			fmt.Printf("%v: ", *n.Title)
@@ -51,5 +45,15 @@ func noteList(cmd *cobra.Command, args []string) {
 	}
 }
 
-func list() {
+func list(limit, offset int) []db.Note {
+	d, err := db.Open(storagePath)
+	if err != nil {
+		panic(err)
+	}
+
+	notes, err := db.ListNotes(d, db.ColumnCreatedAt, false, limit, offset)
+	if err != nil {
+		panic(err)
+	}
+	return notes
 }
