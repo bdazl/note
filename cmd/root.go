@@ -79,19 +79,18 @@ var (
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v", err.Error())
-		os.Exit(1)
+		quitError("root exec", err)
 	}
 }
 
 func init() {
 	dfltConfig, err := defaultConfigPath()
 	if err != nil {
-		panic(err)
+		quitError("default config path", err)
 	}
 	dfltStore, err := defaultStoragePath()
 	if err != nil {
-		panic(err)
+		quitError("default storage path", err)
 	}
 
 	globalFlags := rootCmd.PersistentFlags()
@@ -122,7 +121,7 @@ func noteInit(cmd *cobra.Command, args []string) {
 		fmt.Printf("Writing config file: %v\n", configPath)
 		err := viper.WriteConfig()
 		if err != nil {
-			panic(err)
+			quitError("writing config", err)
 		}
 	}
 
@@ -132,7 +131,7 @@ func noteInit(cmd *cobra.Command, args []string) {
 	} else {
 		fmt.Printf("Create initial db: %v\n", storagePath)
 		if err := db.CreateDb(storagePath); err != nil {
-			panic(err)
+			quitError("creating db", err)
 		}
 	}
 
@@ -146,7 +145,7 @@ func noteInit(cmd *cobra.Command, args []string) {
 func mkdir(path string) {
 	err := os.MkdirAll(path, os.ModePerm)
 	if err != nil {
-		panic(err)
+		quitError("mkdir", err)
 	}
 }
 
@@ -156,4 +155,10 @@ func exists(path string) bool {
 		return false
 	}
 	return err == nil
+}
+
+func quitError(loc string, err error) {
+	msg := fmt.Sprintf("error %v: %v", loc, err)
+	fmt.Fprintln(os.Stderr, msg)
+	os.Exit(1)
 }

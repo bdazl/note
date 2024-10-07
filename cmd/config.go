@@ -38,7 +38,7 @@ func initConfig() {
 	} else {
 		cfgDir, err := defaultConfigDir()
 		if err != nil {
-			panic(err)
+			quitError("init config dir", err)
 		}
 
 		viper.AddConfigPath(cfgDir)
@@ -48,7 +48,7 @@ func initConfig() {
 
 	dfltStore, err := defaultStoragePath()
 	if err != nil {
-		panic(err)
+		quitError("init default store", err)
 	}
 
 	viper.SetDefault(storageKey, dfltStore)

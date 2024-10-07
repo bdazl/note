@@ -48,12 +48,12 @@ func pprintNotes(notes []db.Note) {
 func list(limit, offset int) []db.Note {
 	d, err := db.Open(storagePath)
 	if err != nil {
-		panic(err)
+		quitError("db open", err)
 	}
 
 	notes, err := db.ListNotes(d, db.ColumnCreatedAt, false, limit, offset)
 	if err != nil {
-		panic(err)
+		quitError("db list", err)
 	}
 	return notes
 }

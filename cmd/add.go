@@ -33,7 +33,7 @@ import (
 func noteAdd(cmd *cobra.Command, args []string) {
 	d, err := db.Open(storagePath)
 	if err != nil {
-		panic(err)
+		quitError("db open", err)
 	}
 
 	add := db.Note{
@@ -45,7 +45,7 @@ func noteAdd(cmd *cobra.Command, args []string) {
 
 	id, err := db.AddNote(d, add, false)
 	if err != nil {
-		panic(err)
+		quitError("db add", err)
 	}
 
 	fmt.Println(id)
