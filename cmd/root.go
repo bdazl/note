@@ -74,7 +74,6 @@ var (
 	// Add arguments
 	title    string
 	tags     string
-	newline  bool
 	favorite bool
 )
 
@@ -105,7 +104,6 @@ func init() {
 	addFlags := addCmd.Flags()
 	addFlags.StringVarP(&title, "name", "n", "", "title of note (optional)")
 	addFlags.StringVarP(&tags, "tags", "t", "", "tags of note as a comma separated string (optional)")
-	addFlags.StringVarP(&newline, "newline", "l", " ", "concatenate positional arguments with newline, instead of spaces")
 	addFlags.BoolVarP(&favorite, "favorite", "f", false, "mark note as favorite")
 
 	rootCmd.AddCommand(initCmd, addCmd, listCmd)

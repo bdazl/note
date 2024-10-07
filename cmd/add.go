@@ -58,11 +58,7 @@ func argsToNote(args []string) string {
 		os.Exit(1)
 	}
 
-	sep := " "
-	if newline {
-		sep = "\n"
-	}
-	return strings.Join(args, sep)
+	return strings.Join(args, " ")
 }
 
 func emptyToNil(s *string) *string {
