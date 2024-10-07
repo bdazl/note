@@ -37,7 +37,7 @@ var (
 	rootCmd = &cobra.Command{
 		Use:   "note",
 		Short: "No fuzz terminal note taking",
-		Run:   noteRoot,
+		Run:   noteList,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			currentCmd = cmd
 			initConfig()
@@ -75,6 +75,12 @@ var (
 	title    string
 	tags     string
 	favorite bool
+
+	// List arguments
+	sortBy     string
+	descending bool
+	limit      int
+	offset     int
 )
 
 func Execute() {
@@ -104,6 +110,17 @@ func init() {
 	addFlags.StringVarP(&title, "name", "n", "", "title of note (optional)")
 	addFlags.StringVarP(&tags, "tags", "t", "", "tags of note as a comma separated string (optional)")
 	addFlags.BoolVarP(&favorite, "favorite", "f", false, "mark note as favorite")
+
+	sortKeys := getSortKeys()
+	sortUsage := fmt.Sprintf("column to sort notes by (%v)", sortKeys)
+	listFlags := listCmd.Flags()
+	listFlags.StringVarP(&sortBy, "sort", "s", "id", sortUsage)
+	listFlags.IntVarP(&limit, "limit", "l", 0, "limit amount of notes shown, 0 means no limit")
+	listFlags.IntVarP(&offset, "offset", "o", 0, "begin list notes at some offset")
+	listFlags.BoolVarP(&descending, "descend", "r", false, "descending order")
+
+	// TODO: It makes not sense to include all of lists arguments here
+	rootCmd.Flags().AddFlagSet(listFlags)
 
 	rootCmd.AddCommand(initCmd, addCmd, listCmd)
 }

@@ -23,17 +23,58 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/bdazl/note/db"
 	"github.com/spf13/cobra"
+	"golang.org/x/exp/maps"
 )
 
-func noteRoot(cmd *cobra.Command, args []string) {
-	pprintNotes(list(10, 0))
-}
+var (
+	validSortColumns = map[string]db.NoteColumn{
+		"id":       db.ColumnID,
+		"creation": db.ColumnCreatedAt,
+		"updated":  db.ColumnCreatedAt,
+		"title":    db.ColumnTitle,
+		"archived": db.ColumnIsArchived,
+		"favorite": db.ColumnIsFavorite,
+	}
+)
 
 func noteList(cmd *cobra.Command, args []string) {
-	pprintNotes(list(0, 0))
+	sortColumn, err := checkArguments()
+	if err != nil {
+		quitError("check arguments", err)
+	}
+
+	d, err := db.Open(storagePath)
+	if err != nil {
+		quitError("db open", err)
+	}
+
+	notes, err := db.ListNotes(d, sortColumn, !descending, limit, offset)
+	if err != nil {
+		quitError("db list", err)
+	}
+
+	pprintNotes(notes)
+}
+
+func checkArguments() (db.NoteColumn, error) {
+	sortColumn, err := mapSortBy(sortBy)
+	if err != nil {
+		return "", err
+	}
+
+	if limit < 0 {
+		return "", fmt.Errorf("limit must be zero or positive")
+	} else if limit == 0 && offset != 0 {
+		return "", fmt.Errorf("offset is only valid if you specify a limit")
+	} else if limit > 0 && offset < 0 {
+		return "", fmt.Errorf("offset must be zero or positive")
+	}
+
+	return sortColumn, nil
 }
 
 func pprintNotes(notes []db.Note) {
@@ -45,15 +86,15 @@ func pprintNotes(notes []db.Note) {
 	}
 }
 
-func list(limit, offset int) []db.Note {
-	d, err := db.Open(storagePath)
-	if err != nil {
-		quitError("db open", err)
+func mapSortBy(s string) (db.NoteColumn, error) {
+	out, ok := validSortColumns[s]
+	if !ok {
+		return "", fmt.Errorf("invalid sort option: %v", s)
 	}
+	return out, nil
+}
 
-	notes, err := db.ListNotes(d, db.ColumnCreatedAt, false, limit, offset)
-	if err != nil {
-		quitError("db list", err)
-	}
-	return notes
+func getSortKeys() string {
+	sortKeys := maps.Keys(validSortColumns)
+	return strings.Join(sortKeys, ", ")
 }

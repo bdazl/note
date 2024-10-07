@@ -33,8 +33,7 @@ func AddNote(db *sql.DB, note Note, full bool) (int64, error) {
 	const (
 		smallQuery = "INSERT INTO notes (title, tags, note, is_favorite) VALUES (?, ?, ?, ?);"
 		fullQuery  = `INSERT INTO notes (created_at, updated_at, title, tags, note, is_archived, is_favorite)
-		VALUES (?, ?, ?, ?, ?, ?, ?);
-		`
+		VALUES (?, ?, ?, ?, ?, ?, ?);`
 	)
 	var (
 		dbN    = toDbNote(note)
