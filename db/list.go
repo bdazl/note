@@ -99,18 +99,18 @@ func ListNotes(db *sql.DB, sortBy NoteColumn, ascending bool, limit int, offset 
 }
 
 func validSortColumn(col NoteColumn) error {
-	validSortColumns := map[string]bool{
-		string(ColumnID):         true,
-		string(ColumnCreatedAt):  true,
-		string(ColumnUpdatedAt):  true,
-		string(ColumnTitle):      true,
-		string(ColumnTags):       true,
-		string(ColumnNote):       true,
-		string(ColumnIsArchived): true,
-		string(ColumnIsFavorite): true,
+	validSortColumns := map[NoteColumn]bool{
+		ColumnID:         true,
+		ColumnCreatedAt:  true,
+		ColumnUpdatedAt:  true,
+		ColumnTitle:      true,
+		ColumnTags:       true,
+		ColumnNote:       true,
+		ColumnIsArchived: true,
+		ColumnIsFavorite: true,
 	}
 
-	if !validSortColumns[string(col)] {
+	if !validSortColumns[col] {
 		return fmt.Errorf("invalid sort column: %v", col)
 	}
 	return nil

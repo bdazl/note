@@ -37,16 +37,14 @@ const (
 		is_archived BOOLEAN DEFAULT 0,
 		is_favorite BOOLEAN DEFAULT 0,
 		note TEXT NOT NULL
-	);
-`
+	);`
 
 	createTriggerSql = `CREATE TRIGGER IF NOT EXISTS notes_auto_updated_at
 		AFTER UPDATE ON notes
 		FOR EACH ROW
 		BEGIN
 			UPDATE notes SET updated_at = CURRENT_TIMESTAMP WHERE id = OLD.id;
-		END;
-`
+		END;`
 )
 
 func CreateDb(path string) error {
