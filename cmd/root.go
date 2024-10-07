@@ -101,7 +101,7 @@ func init() {
 
 	globalFlags := rootCmd.PersistentFlags()
 	globalFlags.StringVarP(&configPath, "config", "c", dfltConfig, "config file")
-	globalFlags.StringVarP(&storagePath, "store", "d", dfltStore, "database store containing your notes")
+	globalFlags.StringVarP(&storagePath, "db", "d", dfltStore, "database store containing your notes")
 
 	initFlags := initCmd.Flags()
 	initFlags.BoolVar(&force, "force", false, "determines if existing files will be overwritten")
