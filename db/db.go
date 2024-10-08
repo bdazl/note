@@ -21,8 +21,23 @@ THE SOFTWARE.
 */
 package db
 
-import "database/sql"
+import (
+	"database/sql"
+	"fmt"
+	"os"
+)
 
 func Open(path string) (*sql.DB, error) {
+	s, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return nil, fmt.Errorf("file does not exist: %v", path)
+	} else if s.IsDir() {
+		return nil, fmt.Errorf("database is not a directory: %v", path)
+	}
+
+	return open(path)
+}
+
+func open(path string) (*sql.DB, error) {
 	return sql.Open("sqlite3", path)
 }

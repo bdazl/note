@@ -48,7 +48,7 @@ const (
 )
 
 func CreateDb(path string) error {
-	db, err := Open(path)
+	db, err := open(path)
 	if err != nil {
 		return fmt.Errorf("open: %w", err)
 	}
