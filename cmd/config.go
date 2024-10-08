@@ -24,6 +24,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/spf13/viper"
 )
@@ -48,6 +49,7 @@ func initConfig() {
 	}
 
 	viper.SetDefault("db", dfltStore)
+	viper.SetDefault("editor", defaultEditor())
 
 	viper.AutomaticEnv()
 
@@ -57,6 +59,21 @@ func initConfig() {
 		if cmdPath != "note init" {
 			fmt.Fprintln(os.Stderr, "Could not read config file, consider running: note init")
 		}
+	}
+}
+
+func defaultEditor() string {
+	switch os := runtime.GOOS; os {
+	case "linux":
+		return "nano" // it pains me to put this here...
+	case "darwin":
+		return "open -a TextEdit"
+	case "windows":
+		return "notepad"
+	case "plan9":
+		return "acme"
+	default:
+		return "vim"
 	}
 }
 

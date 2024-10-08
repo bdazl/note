@@ -25,10 +25,12 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/bdazl/note/db"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func noteAdd(cmd *cobra.Command, args []string) {
@@ -69,7 +71,53 @@ func produceNote(args []string) string {
 		return string(data)
 	}
 
-	return noteFromArgs(args)
+	if len(args) == 0 {
+		note, err := openInEditor()
+		if err != nil {
+			quitError("open editor", err)
+		}
+		return note
+	}
+
+	return strings.Join(args, " ")
+}
+
+func openInEditor() (string, error) {
+	// Create a temporary file
+	tmpFile, err := os.CreateTemp("", "note.*.txt")
+	if err != nil {
+		return "", fmt.Errorf("failed to create temp file: %w", err)
+	}
+	defer os.Remove(tmpFile.Name()) // Ensure the file is removed
+
+	// Close the file so the editor can open it
+	if err := tmpFile.Close(); err != nil {
+		return "", fmt.Errorf("failed to close temp file: %w", err)
+	}
+
+	// Get the editor from configuration or environment
+	editor := viper.GetString("editor")
+
+	// Open the file with the editor
+	cmd := exec.Command(editor, tmpFile.Name())
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("failed to open editor: %w", err)
+	}
+
+	content, err := os.ReadFile(tmpFile.Name())
+	if err != nil {
+		return "", fmt.Errorf("failed to read file after close: %w", err)
+	}
+
+	if len(content) == 0 {
+		return "", fmt.Errorf("nothing to add")
+	}
+
+	return string(content), nil
 }
 
 func checkAddArguments(args []string) (*os.File, error) {
@@ -84,16 +132,6 @@ func checkAddArguments(args []string) (*os.File, error) {
 		return os.Stdin, nil
 	}
 	return os.Open(file)
-}
-
-func noteFromArgs(args []string) string {
-	if len(args) == 0 {
-		// TODO: Open $EDITOR
-		fmt.Fprintln(os.Stderr, "no note value provided")
-		os.Exit(1)
-	}
-
-	return strings.Join(args, " ")
 }
 
 func emptyToNil(s *string) *string {
