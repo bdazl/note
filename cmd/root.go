@@ -60,13 +60,10 @@ var (
 		Short:   "Prints some or all of your notes",
 		Run:     noteList,
 	}
-)
 
-// Command line argument values
-var (
 	// Global arguments
-	configPath  string
-	storagePath string
+	configPath         string
+	storagePathCmdLine string
 
 	// Init argument
 	force bool
@@ -102,7 +99,10 @@ func init() {
 
 	globalFlags := rootCmd.PersistentFlags()
 	globalFlags.StringVarP(&configPath, "config", "c", dfltConfig, "config file")
-	globalFlags.StringVarP(&storagePath, "db", "d", dfltStore, "database store containing your notes")
+	globalFlags.StringVarP(&storagePathCmdLine, "db", "d", dfltStore, "database store containing your notes")
+
+	// db can exist in config file
+	viper.BindPFlag("db", globalFlags.Lookup("db"))
 
 	initFlags := initCmd.Flags()
 	initFlags.BoolVar(&force, "force", false, "determines if existing files will be overwritten")
@@ -129,9 +129,18 @@ func init() {
 
 func noteInit(cmd *cobra.Command, args []string) {
 	forceInform := false
+	dbF, err := filepath.Abs(storagePathCmdLine) // When doing init we explicitly want the command line option
+	if err != nil {
+		quitError("db path", err)
+	}
+
+	// We force viper to set value to the (abs path of the) command line option here
+	// This is because init may be re-ran after we have a valid config setup, and we don't want to then source
+	// the option from the config file.
+	viper.Set("db", dbF)
 
 	mkdir(filepath.Dir(configPath))
-	mkdir(filepath.Dir(storagePath))
+	mkdir(filepath.Dir(dbF))
 
 	if !force && exists(configPath) {
 		fmt.Fprintln(os.Stderr, "Config file already exists")
@@ -144,12 +153,12 @@ func noteInit(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	if !force && exists(storagePath) {
+	if !force && exists(dbF) {
 		fmt.Fprintln(os.Stderr, "Storage file already exists")
 		forceInform = true
 	} else {
-		fmt.Printf("Create initial db: %v\n", storagePath)
-		if err := db.CreateDb(storagePath); err != nil {
+		fmt.Printf("Create initial db: %v\n", dbF)
+		if err := db.CreateDb(dbF); err != nil {
 			quitError("creating db", err)
 		}
 	}

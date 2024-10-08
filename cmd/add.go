@@ -34,7 +34,7 @@ import (
 func noteAdd(cmd *cobra.Command, args []string) {
 	note := produceNote(args)
 
-	d, err := db.Open(storagePath)
+	d, err := db.Open(dbFilename())
 	if err != nil {
 		quitError("db open", err)
 	}

@@ -32,7 +32,7 @@ const (
 	note = "note"
 
 	defaultConfigName  = "note.yaml"
-	defaultStorageName = "storage.db"
+	defaultStorageName = "note.db"
 
 	defaultConfig = ".config/note"
 	defaultData   = ".local/share/note"

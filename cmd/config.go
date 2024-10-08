@@ -28,10 +28,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-const (
-	storageKey = "storage"
-)
-
 func initConfig() {
 	if configPath != "" {
 		viper.SetConfigFile(configPath)
@@ -51,7 +47,7 @@ func initConfig() {
 		quitError("init default store", err)
 	}
 
-	viper.SetDefault(storageKey, dfltStore)
+	viper.SetDefault("db", dfltStore)
 
 	viper.AutomaticEnv()
 
@@ -62,4 +58,8 @@ func initConfig() {
 			fmt.Fprintln(os.Stderr, "Could not read config file, consider running: note init")
 		}
 	}
+}
+
+func dbFilename() string {
+	return viper.GetString("db")
 }

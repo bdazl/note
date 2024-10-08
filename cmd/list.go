@@ -47,7 +47,7 @@ func noteList(cmd *cobra.Command, args []string) {
 		quitError("args", err)
 	}
 
-	d, err := db.Open(storagePath)
+	d, err := db.Open(dbFilename())
 	if err != nil {
 		quitError("db open", err)
 	}
