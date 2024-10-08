@@ -49,10 +49,15 @@ var (
 		Run:   noteInit,
 	}
 	addCmd = &cobra.Command{
-		Use:     "add note [notes...]",
-		Aliases: []string{"a"},
-		Short:   "Add a new note",
-		Run:     noteAdd,
+		Use:   "add [notes...]",
+		Short: "Add new note",
+		Run:   noteAdd,
+	}
+	rmCmd = &cobra.Command{
+		Use:     "remove [id...]",
+		Aliases: []string{"rm"},
+		Short:   "Remove note(s) with id(s)",
+		Run:     noteRemove,
 	}
 	listCmd = &cobra.Command{
 		Use:     "list",
@@ -122,9 +127,9 @@ func init() {
 	listFlags.BoolVarP(&descending, "descend", "r", false, "descending order")
 
 	// TODO: It makes not sense to include all of lists arguments here
-	rootCmd.Flags().AddFlagSet(listFlags)
+	// rootCmd.Flags().AddFlagSet(listFlags)
 
-	rootCmd.AddCommand(initCmd, addCmd, listCmd)
+	rootCmd.AddCommand(initCmd, addCmd, rmCmd, listCmd)
 }
 
 func noteInit(cmd *cobra.Command, args []string) {
