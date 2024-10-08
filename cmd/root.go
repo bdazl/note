@@ -74,6 +74,7 @@ var (
 	// Add arguments
 	title    string
 	tags     string
+	file     string
 	favorite bool
 
 	// List arguments
@@ -107,9 +108,10 @@ func init() {
 	initFlags.BoolVar(&force, "force", false, "determines if existing files will be overwritten")
 
 	addFlags := addCmd.Flags()
-	addFlags.StringVarP(&title, "name", "n", "", "title of note (optional)")
-	addFlags.StringVarP(&tags, "tags", "t", "", "tags of note as a comma separated string (optional)")
-	addFlags.BoolVarP(&favorite, "favorite", "f", false, "mark note as favorite")
+	addFlags.StringVarP(&title, "name", "n", "", "title of note")
+	addFlags.StringVarP(&tags, "tags", "t", "", "tags of note as a comma separated string")
+	addFlags.StringVarP(&file, "file", "f", "", "the note is read from file")
+	addFlags.BoolVar(&favorite, "fav", false, "mark note as favorite")
 
 	sortKeys := getSortKeys()
 	sortUsage := fmt.Sprintf("column to sort notes by (%v)", sortKeys)

@@ -42,9 +42,9 @@ var (
 )
 
 func noteList(cmd *cobra.Command, args []string) {
-	sortColumn, err := checkArguments()
+	sortColumn, err := checkSortArguments()
 	if err != nil {
-		quitError("check arguments", err)
+		quitError("args", err)
 	}
 
 	d, err := db.Open(storagePath)
@@ -60,7 +60,7 @@ func noteList(cmd *cobra.Command, args []string) {
 	pprintNotes(notes)
 }
 
-func checkArguments() (db.NoteColumn, error) {
+func checkSortArguments() (db.NoteColumn, error) {
 	sortColumn, err := mapSortBy(sortBy)
 	if err != nil {
 		return "", err

@@ -23,6 +23,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -31,6 +32,8 @@ import (
 )
 
 func noteAdd(cmd *cobra.Command, args []string) {
+	note := produceNote(args)
+
 	d, err := db.Open(storagePath)
 	if err != nil {
 		quitError("db open", err)
@@ -39,7 +42,7 @@ func noteAdd(cmd *cobra.Command, args []string) {
 	add := db.Note{
 		Title:      emptyToNil(&title),
 		Tags:       emptyToNil(&tags),
-		Note:       argsToNote(args),
+		Note:       note,
 		IsFavorite: favorite,
 	}
 
@@ -51,7 +54,39 @@ func noteAdd(cmd *cobra.Command, args []string) {
 	fmt.Println(id)
 }
 
-func argsToNote(args []string) string {
+func produceNote(args []string) string {
+	fileptr, err := checkAddArguments(args)
+	if err != nil {
+		quitError("args", err)
+	}
+
+	// Any fileptr takes precedence and we know from the arg check that len(args) == 0
+	if fileptr != nil {
+		data, err := io.ReadAll(fileptr)
+		if err != nil {
+			quitError("read file", err)
+		}
+		return string(data)
+	}
+
+	return noteFromArgs(args)
+}
+
+func checkAddArguments(args []string) (*os.File, error) {
+	if file == "" {
+		return nil, nil
+	}
+	// file != ""
+	if len(args) > 0 {
+		return nil, fmt.Errorf("you can't specify both --file and positional arguments")
+	}
+	if file == "-" {
+		return os.Stdin, nil
+	}
+	return os.Open(file)
+}
+
+func noteFromArgs(args []string) string {
 	if len(args) == 0 {
 		// TODO: Open $EDITOR
 		fmt.Fprintln(os.Stderr, "no note value provided")
