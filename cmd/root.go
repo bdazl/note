@@ -99,7 +99,7 @@ func init() {
 
 	globalFlags := rootCmd.PersistentFlags()
 	globalFlags.StringVarP(&configPath, "config", "c", dfltConfig, "config file")
-	globalFlags.StringVarP(&storagePathCmdLine, "db", "d", dfltStore, "database store containing your notes")
+	globalFlags.StringVar(&storagePathCmdLine, "db", dfltStore, "database store containing your notes")
 
 	// db can exist in config file
 	viper.BindPFlag("db", globalFlags.Lookup("db"))
