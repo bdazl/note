@@ -27,7 +27,11 @@ import (
 	"os"
 )
 
-func Open(path string) (*sql.DB, error) {
+type DB struct {
+	db *sql.DB
+}
+
+func Open(path string) (*DB, error) {
 	s, err := os.Stat(path)
 	if os.IsNotExist(err) {
 		return nil, fmt.Errorf("file does not exist: %v", path)
@@ -38,6 +42,10 @@ func Open(path string) (*sql.DB, error) {
 	return open(path)
 }
 
-func open(path string) (*sql.DB, error) {
-	return sql.Open("sqlite3", path)
+func open(path string) (*DB, error) {
+	db, err := sql.Open("sqlite3", path)
+	if err != nil {
+		return nil, err
+	}
+	return &DB{db: db}, nil
 }

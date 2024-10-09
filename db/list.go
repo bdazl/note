@@ -22,7 +22,6 @@ THE SOFTWARE.
 package db
 
 import (
-	"database/sql"
 	"fmt"
 )
 
@@ -30,7 +29,7 @@ const (
 	NoLimit = 0
 )
 
-func ListNotes(db *sql.DB, sortBy NoteColumn, ascending bool, limit int, offset int) ([]Note, error) {
+func (d *DB) ListNotes(sortBy NoteColumn, ascending bool, limit int, offset int) ([]Note, error) {
 	err := validSortColumn(sortBy)
 	if err != nil {
 		return nil, err
@@ -64,7 +63,7 @@ func ListNotes(db *sql.DB, sortBy NoteColumn, ascending bool, limit int, offset 
 	)
 
 	// Execute the query
-	rows, err := db.Query(query, addParams...)
+	rows, err := d.db.Query(query, addParams...)
 	if err != nil {
 		return nil, fmt.Errorf("query error: %w", err)
 	}

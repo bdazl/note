@@ -22,14 +22,13 @@ THE SOFTWARE.
 package db
 
 import (
-	"database/sql"
 	"fmt"
 )
 
-func RemoveNote(db *sql.DB, id int) error {
+func (d *DB) RemoveNote(id int) error {
 	query := "DELETE FROM notes WHERE id = ?"
 
-	result, err := db.Exec(query, id)
+	result, err := d.db.Exec(query, id)
 	if err != nil {
 		return err
 	}

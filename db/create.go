@@ -47,21 +47,21 @@ const (
 		END;`
 )
 
-func CreateDb(path string) error {
+func CreateDb(path string) (*DB, error) {
 	db, err := open(path)
 	if err != nil {
-		return fmt.Errorf("open: %w", err)
+		return nil, fmt.Errorf("open: %w", err)
 	}
-	defer db.Close()
+	defer db.db.Close()
 
-	_, err = db.Exec(createTableSql)
+	_, err = db.db.Exec(createTableSql)
 	if err != nil {
-		return fmt.Errorf("create notes table: %w", err)
+		return nil, fmt.Errorf("create notes table: %w", err)
 	}
 
-	_, err = db.Exec(createTriggerSql)
+	_, err = db.db.Exec(createTriggerSql)
 	if err != nil {
-		return fmt.Errorf("create trigger: %w", err)
+		return nil, fmt.Errorf("create trigger: %w", err)
 	}
-	return nil
+	return db, nil
 }

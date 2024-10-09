@@ -41,7 +41,7 @@ func noteRemove(cmd *cobra.Command, args []string) {
 	}
 
 	for _, id := range ids {
-		if err := db.RemoveNote(d, id); err != nil {
+		if err := d.RemoveNote(id); err != nil {
 			quitError("db remove", err)
 		}
 	}

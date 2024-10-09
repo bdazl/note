@@ -22,14 +22,13 @@ THE SOFTWARE.
 package db
 
 import (
-	"database/sql"
 	"fmt"
 )
 
 // Add a note to the database.
 // If full is true, then all values (except ID) are taken from the input,
 // otherwise timestamps and other default values are set automatically.
-func AddNote(db *sql.DB, note Note, full bool) (int64, error) {
+func (d *DB) AddNote(note Note, full bool) (int64, error) {
 	const (
 		smallQuery = "INSERT INTO notes (title, tags, note, is_favorite) VALUES (?, ?, ?, ?);"
 		fullQuery  = `INSERT INTO notes (created_at, updated_at, title, tags, note, is_archived, is_favorite)
@@ -57,7 +56,7 @@ func AddNote(db *sql.DB, note Note, full bool) (int64, error) {
 		params = []any{dbN.Title, dbN.Tags, dbN.Note, dbN.IsFavorite}
 	}
 
-	result, err := db.Exec(query, params...)
+	result, err := d.db.Exec(query, params...)
 	if err != nil {
 		return 0, fmt.Errorf("insert error: %w", err)
 	}

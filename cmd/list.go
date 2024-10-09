@@ -52,7 +52,7 @@ func noteList(cmd *cobra.Command, args []string) {
 		quitError("db open", err)
 	}
 
-	notes, err := db.ListNotes(d, sortColumn, !descending, limit, offset)
+	notes, err := d.ListNotes(sortColumn, !descending, limit, offset)
 	if err != nil {
 		quitError("db list", err)
 	}

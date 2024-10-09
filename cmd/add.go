@@ -48,7 +48,7 @@ func noteAdd(cmd *cobra.Command, args []string) {
 		IsFavorite: favorite,
 	}
 
-	id, err := db.AddNote(d, add, false)
+	id, err := d.AddNote(add, false)
 	if err != nil {
 		quitError("db add", err)
 	}

@@ -163,7 +163,7 @@ func noteInit(cmd *cobra.Command, args []string) {
 		forceInform = true
 	} else {
 		fmt.Printf("Create initial db: %v\n", dbF)
-		if err := db.CreateDb(dbF); err != nil {
+		if _, err := db.CreateDb(dbF); err != nil {
 			quitError("creating db", err)
 		}
 	}
