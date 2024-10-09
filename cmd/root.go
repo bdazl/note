@@ -74,10 +74,9 @@ var (
 	force bool
 
 	// Add arguments
-	title    string
-	tags     string
-	file     string
-	favorite bool
+	namespace string
+	file      string
+	pinned    bool
 
 	// List arguments
 	sortBy     string
@@ -106,17 +105,13 @@ func init() {
 	globalFlags.StringVarP(&configPath, "config", "c", dfltConfig, "config file")
 	globalFlags.StringVar(&storagePathCmdLine, "db", dfltStore, "database store containing your notes")
 
-	// db can exist in config file
-	viper.BindPFlag("db", globalFlags.Lookup("db"))
-
 	initFlags := initCmd.Flags()
 	initFlags.BoolVar(&force, "force", false, "determines if existing files will be overwritten")
 
 	addFlags := addCmd.Flags()
-	addFlags.StringVarP(&title, "name", "n", "", "title of note")
-	addFlags.StringVarP(&tags, "tags", "t", "", "tags of note as a comma separated string")
+	addFlags.StringVarP(&namespace, "namespace", "n", "main", "partition the note into a namespace")
 	addFlags.StringVarP(&file, "file", "f", "", "the note is read from file")
-	addFlags.BoolVar(&favorite, "fav", false, "mark note as favorite")
+	addFlags.BoolVarP(&pinned, "pinned", "p", false, "pin your note to the top")
 
 	sortKeys := getSortKeys()
 	sortUsage := fmt.Sprintf("column to sort notes by (%v)", sortKeys)
@@ -125,6 +120,10 @@ func init() {
 	listFlags.IntVarP(&limit, "limit", "l", 0, "limit amount of notes shown, 0 means no limit")
 	listFlags.IntVarP(&offset, "offset", "o", 0, "begin list notes at some offset")
 	listFlags.BoolVarP(&descending, "descend", "r", false, "descending order")
+
+	// These variables can exist in the config file or as environment variables as well
+	viper.BindPFlag("db", globalFlags.Lookup("db"))
+	viper.BindPFlag("namespace", addFlags.Lookup("namespace"))
 
 	// TODO: It makes not sense to include all of lists arguments here
 	// rootCmd.Flags().AddFlagSet(listFlags)

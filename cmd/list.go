@@ -32,12 +32,11 @@ import (
 
 var (
 	validSortColumns = map[string]db.NoteColumn{
-		"id":       db.ColumnID,
-		"creation": db.ColumnCreatedAt,
-		"updated":  db.ColumnCreatedAt,
-		"title":    db.ColumnTitle,
-		"archived": db.ColumnIsArchived,
-		"favorite": db.ColumnIsFavorite,
+		"id":        db.ColumnID,
+		"namespace": db.ColumnNamespace,
+		"content":   db.ColumnContent,
+		"created":   db.ColumnCreatedAt,
+		"updated":   db.ColumnCreatedAt,
 	}
 )
 
@@ -79,10 +78,7 @@ func checkSortArguments() (db.NoteColumn, error) {
 
 func pprintNotes(notes []db.Note) {
 	for _, n := range notes {
-		if n.Title != nil && *n.Title != "" {
-			fmt.Printf("%v: ", *n.Title)
-		}
-		fmt.Println(n.Note)
+		fmt.Println(n.Content)
 	}
 }
 

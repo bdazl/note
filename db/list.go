@@ -29,6 +29,17 @@ const (
 	NoLimit = 0
 )
 
+var (
+	validSortColumns = map[NoteColumn]bool{
+		ColumnID:        true,
+		ColumnNamespace: true,
+		ColumnCreatedAt: true,
+		ColumnUpdatedAt: true,
+		ColumnContent:   true,
+		ColumnIsPinned:  true,
+	}
+)
+
 func (d *DB) ListNotes(sortBy NoteColumn, ascending bool, limit int, offset int) ([]Note, error) {
 	err := validSortColumn(sortBy)
 	if err != nil {
@@ -56,7 +67,7 @@ func (d *DB) ListNotes(sortBy NoteColumn, ascending bool, limit int, offset int)
 		addParams = append(addParams, offset)
 	}
 	query := fmt.Sprintf(`
-        SELECT id, created_at, updated_at, title, tags, note, is_archived, is_favorite
+        SELECT id, namespace, created_at, updated_at, content, is_pinned
         FROM notes
         ORDER BY %v %v
         %v`, string(sortBy), order, loff,
@@ -75,13 +86,11 @@ func (d *DB) ListNotes(sortBy NoteColumn, ascending bool, limit int, offset int)
 	for rows.Next() {
 		err := rows.Scan(
 			&dbN.ID,
+			&dbN.Namespace,
 			&dbN.CreatedAt,
 			&dbN.UpdatedAt,
-			&dbN.Title,
-			&dbN.Tags,
-			&dbN.Note,
-			&dbN.IsArchived,
-			&dbN.IsFavorite,
+			&dbN.Content,
+			&dbN.IsPinned,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("row scan error: %w", err)
@@ -98,17 +107,6 @@ func (d *DB) ListNotes(sortBy NoteColumn, ascending bool, limit int, offset int)
 }
 
 func validSortColumn(col NoteColumn) error {
-	validSortColumns := map[NoteColumn]bool{
-		ColumnID:         true,
-		ColumnCreatedAt:  true,
-		ColumnUpdatedAt:  true,
-		ColumnTitle:      true,
-		ColumnTags:       true,
-		ColumnNote:       true,
-		ColumnIsArchived: true,
-		ColumnIsFavorite: true,
-	}
-
 	if !validSortColumns[col] {
 		return fmt.Errorf("invalid sort column: %v", col)
 	}

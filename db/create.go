@@ -30,13 +30,11 @@ import (
 const (
 	createTableSql = `CREATE TABLE IF NOT EXISTS notes (
 		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+		namespace TEXT NOT NULL,
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-		title TEXT DEFAULT NULL,
-		tags TEXT DEFAULT NULL,
-		is_archived BOOLEAN DEFAULT 0,
-		is_favorite BOOLEAN DEFAULT 0,
-		note TEXT NOT NULL
+		content TEXT NOT NULL,
+		is_pinned BOOLEAN DEFAULT 0
 	);`
 
 	createTriggerSql = `CREATE TRIGGER IF NOT EXISTS notes_auto_updated_at

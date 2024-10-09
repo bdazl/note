@@ -34,7 +34,7 @@ import (
 )
 
 func noteAdd(cmd *cobra.Command, args []string) {
-	note := produceNote(args)
+	content := produceNote(args)
 
 	d, err := db.Open(dbFilename())
 	if err != nil {
@@ -42,10 +42,9 @@ func noteAdd(cmd *cobra.Command, args []string) {
 	}
 
 	add := db.Note{
-		Title:      emptyToNil(&title),
-		Tags:       emptyToNil(&tags),
-		Note:       note,
-		IsFavorite: favorite,
+		Namespace: namespace,
+		Content:   content,
+		IsPinned:  pinned,
 	}
 
 	id, err := d.AddNote(add, false)
@@ -132,11 +131,4 @@ func checkAddArguments(args []string) (*os.File, error) {
 		return os.Stdin, nil
 	}
 	return os.Open(file)
-}
-
-func emptyToNil(s *string) *string {
-	if s == nil || *s == "" {
-		return nil
-	}
-	return s
 }
