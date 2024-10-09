@@ -55,7 +55,7 @@ var (
 	}
 	rmCmd = &cobra.Command{
 		Use:     "remove [id...]",
-		Aliases: []string{"rm"},
+		Aliases: []string{"rm", "del"},
 		Short:   "Remove note(s) with id(s)",
 		Run:     noteRemove,
 	}
