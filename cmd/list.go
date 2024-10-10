@@ -42,24 +42,9 @@ var (
 )
 
 func noteList(cmd *cobra.Command, args []string) {
-	sortOpts, pageOpts, err := listOpts()
+	notes, err := collectNotes()
 	if err != nil {
-		quitError("args", err)
-	}
-
-	d, err := db.Open(dbFilename())
-	if err != nil {
-		quitError("db open", err)
-	}
-
-	spaces, err := getSpaces(d)
-	if err != nil {
-		quitError("ls spaces", err)
-	}
-
-	notes, err := d.ListNotes(spaces, sortOpts, pageOpts)
-	if err != nil {
-		quitError("db list", err)
+		quitError("collect", err)
 	}
 
 	pprintNotes(notes)
@@ -78,6 +63,29 @@ func noteSpaces(cmd *cobra.Command, args []string) {
 
 	spacesStr := strings.Join(spaces, " ")
 	fmt.Println(spacesStr)
+}
+
+func collectNotes() ([]db.Note, error) {
+	sortOpts, pageOpts, err := listOpts()
+	if err != nil {
+		return nil, fmt.Errorf("args: %w", err)
+	}
+
+	d, err := db.Open(dbFilename())
+	if err != nil {
+		return nil, fmt.Errorf("db open: %w", err)
+	}
+
+	spaces, err := getSpaces(d)
+	if err != nil {
+		return nil, fmt.Errorf("ls spaces: %w", err)
+	}
+
+	notes, err := d.ListNotes(spaces, sortOpts, pageOpts)
+	if err != nil {
+		return nil, fmt.Errorf("db list: %w", err)
+	}
+	return notes, nil
 }
 
 func listOpts() (*db.SortOpts, *db.PageOpts, error) {

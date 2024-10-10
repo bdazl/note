@@ -28,6 +28,7 @@ import (
 
 	"github.com/bdazl/note/db"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
@@ -53,7 +54,7 @@ var (
 		Short: "Add new note",
 		Run:   noteAdd,
 	}
-	rmCmd = &cobra.Command{
+	removeCmd = &cobra.Command{
 		Use:     "remove [id...]",
 		Aliases: []string{"rm", "del"},
 		Short:   "Remove note(s) with id(s)",
@@ -69,6 +70,11 @@ var (
 		Use:   "spaces",
 		Short: "Prints all spaces that holds notes",
 		Run:   noteSpaces,
+	}
+	exportCmd = &cobra.Command{
+		Use:   "export",
+		Short: "Export notes to JSON or YAML file",
+		Run:   noteExport,
 	}
 
 	// Global arguments
@@ -88,6 +94,13 @@ var (
 	descendingArg bool
 	limitArg      int
 	offsetArg     int
+
+	// Export arguments
+	jsonArg       bool
+	yamlArg       bool
+	jsonIndentArg string
+	jsonPrefixArg string
+	yamlSpacesArg int
 )
 
 func Execute() {
@@ -120,23 +133,32 @@ func init() {
 
 	sortKeys := getSortKeys()
 	sortUsage := fmt.Sprintf("column to sort notes by (%v)", sortKeys)
+	collectFlagSet := pflag.NewFlagSet("collect", pflag.ExitOnError)
+	collectFlagSet.BoolVarP(&allArg, "all", "a", false, "show notes from all spaces")
+	_ = collectFlagSet.StringSliceP("spaces", "s", []string{DefaultSpace}, "only show notes from space(s)")
+	collectFlagSet.StringVarP(&sortByArg, "sort", "S", "id", sortUsage)
+	collectFlagSet.IntVarP(&limitArg, "limit", "l", 0, "limit amount of notes shown, 0 means no limit")
+	collectFlagSet.IntVarP(&offsetArg, "offset", "o", 0, "begin list notes at some offset (only if limit > 0)")
+	collectFlagSet.BoolVarP(&descendingArg, "descending", "r", false, "descending order")
+
 	listFlags := listCmd.Flags()
-	listFlags.BoolVarP(&allArg, "all", "a", false, "show notes from all spaces")
-	_ = listFlags.StringSliceP("spaces", "s", []string{DefaultSpace}, "only show notes from space(s)")
-	listFlags.StringVarP(&sortByArg, "sort", "S", "id", sortUsage)
-	listFlags.IntVarP(&limitArg, "limit", "l", 0, "limit amount of notes shown, 0 means no limit")
-	listFlags.IntVarP(&offsetArg, "offset", "o", 0, "begin list notes at some offset")
-	listFlags.BoolVarP(&descendingArg, "descending", "r", false, "descending order")
+	listFlags.AddFlagSet(collectFlagSet)
+
+	exportFlags := exportCmd.Flags()
+	exportFlags.AddFlagSet(collectFlagSet)
+	exportFlags.BoolVar(&forceArg, "force", false, "determines if existing file will be overwritten")
+	exportFlags.BoolVarP(&jsonArg, "json", "j", false, "export notes in JSON format")
+	exportFlags.BoolVarP(&yamlArg, "yaml", "y", false, "export notes in YAML format")
+	exportFlags.StringVarP(&jsonIndentArg, "indent", "i", "", "JSON indentation encoding option")
+	exportFlags.StringVarP(&jsonPrefixArg, "prefix", "p", "", "JSON prefix encoding option")
+	exportFlags.IntVarP(&yamlSpacesArg, "yaml-spaces", "P", 4, "YAML spaces encoding option")
 
 	// These variables can exist in the config file or as environment variables as well
 	viper.BindPFlag("db", globalFlags.Lookup("db"))
 	viper.BindPFlag("add_space", addFlags.Lookup("space"))
 	viper.BindPFlag("ls_spaces", listFlags.Lookup("spaces"))
 
-	// TODO: It makes not sense to include all of lists arguments here
-	// rootCmd.Flags().AddFlagSet(listFlags)
-
-	rootCmd.AddCommand(initCmd, addCmd, rmCmd, listCmd, spacesCmd)
+	rootCmd.AddCommand(initCmd, addCmd, removeCmd, listCmd, spacesCmd, exportCmd)
 }
 
 func noteInit(cmd *cobra.Command, args []string) {
