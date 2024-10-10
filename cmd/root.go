@@ -83,6 +83,7 @@ var (
 	pinnedArg bool
 
 	// List arguments
+	allArg        bool
 	sortByArg     string
 	descendingArg bool
 	limitArg      int
@@ -120,6 +121,7 @@ func init() {
 	sortKeys := getSortKeys()
 	sortUsage := fmt.Sprintf("column to sort notes by (%v)", sortKeys)
 	listFlags := listCmd.Flags()
+	listFlags.BoolVarP(&allArg, "all", "a", false, "show notes from all spaces")
 	_ = listFlags.StringSliceP("spaces", "s", []string{DefaultSpace}, "only show notes from space(s)")
 	listFlags.StringVarP(&sortByArg, "sort", "S", "id", sortUsage)
 	listFlags.IntVarP(&limitArg, "limit", "l", 0, "limit amount of notes shown, 0 means no limit")

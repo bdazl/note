@@ -52,7 +52,10 @@ func noteList(cmd *cobra.Command, args []string) {
 		quitError("db open", err)
 	}
 
-	spaces := viper.GetStringSlice(ViperListSpaces)
+	spaces, err := getSpaces(d)
+	if err != nil {
+		quitError("ls spaces", err)
+	}
 
 	notes, err := d.ListNotes(spaces, sortOpts, pageOpts)
 	if err != nil {
@@ -103,6 +106,17 @@ func pprintNotes(notes []db.Note) {
 	for _, n := range notes {
 		fmt.Println(n.Content)
 	}
+}
+
+func getSpaces(d *db.DB) ([]string, error) {
+	if allArg {
+		spaces, err := d.ListSpaces()
+		if err != nil {
+			return nil, err
+		}
+		return spaces, nil
+	}
+	return viper.GetStringSlice(ViperListSpaces), nil
 }
 
 func mapSortColumn(s string) (db.NoteColumn, error) {
