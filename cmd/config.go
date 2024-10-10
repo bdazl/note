@@ -39,8 +39,8 @@ const (
 )
 
 func initConfig() {
-	if configPath != "" {
-		viper.SetConfigFile(configPath)
+	if configPathArg != "" {
+		viper.SetConfigFile(configPathArg)
 	} else {
 		cfgDir, err := defaultConfigDir()
 		if err != nil {

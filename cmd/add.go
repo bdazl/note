@@ -44,7 +44,7 @@ func noteAdd(cmd *cobra.Command, args []string) {
 	add := db.Note{
 		Space:    viper.GetString(ViperAddSpace),
 		Content:  content,
-		IsPinned: pinned,
+		IsPinned: pinnedArg,
 	}
 
 	id, err := d.AddNote(add, false)
@@ -120,15 +120,15 @@ func openInEditor() (string, error) {
 }
 
 func checkAddArguments(args []string) (*os.File, error) {
-	if file == "" {
+	if fileArg == "" {
 		return nil, nil
 	}
 	// file != ""
 	if len(args) > 0 {
 		return nil, fmt.Errorf("you can't specify both --file and positional arguments")
 	}
-	if file == "-" {
+	if fileArg == "-" {
 		return os.Stdin, nil
 	}
-	return os.Open(file)
+	return os.Open(fileArg)
 }

@@ -78,20 +78,20 @@ func noteSpaces(cmd *cobra.Command, args []string) {
 }
 
 func listOpts() (*db.SortOpts, *db.PageOpts, error) {
-	sortColumn, err := mapSortColumn(sortBy)
+	sortColumn, err := mapSortColumn(sortByArg)
 	if err != nil {
 		return nil, nil, err
 	}
 	sortOpts := &db.SortOpts{
-		Ascending:  !descending,
+		Ascending:  !descendingArg,
 		SortColumn: sortColumn,
 	}
 	if err = sortOpts.Check(); err != nil {
 		return nil, nil, err
 	}
 	pageOpts := &db.PageOpts{
-		Limit:  limit,
-		Offset: offset,
+		Limit:  limitArg,
+		Offset: offsetArg,
 	}
 	if err = pageOpts.Check(); err != nil {
 		return nil, nil, err

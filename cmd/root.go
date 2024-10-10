@@ -72,21 +72,21 @@ var (
 	}
 
 	// Global arguments
-	configPath         string
-	storagePathCmdLine string
+	configPathArg  string
+	storagePathArg string
 
 	// Init argument
-	force bool
+	forceArg bool
 
 	// Add arguments
-	file   string
-	pinned bool
+	fileArg   string
+	pinnedArg bool
 
 	// List arguments
-	sortBy     string
-	descending bool
-	limit      int
-	offset     int
+	sortByArg     string
+	descendingArg bool
+	limitArg      int
+	offsetArg     int
 )
 
 func Execute() {
@@ -106,25 +106,25 @@ func init() {
 	}
 
 	globalFlags := rootCmd.PersistentFlags()
-	globalFlags.StringVarP(&configPath, "config", "c", dfltConfig, "config file")
-	globalFlags.StringVar(&storagePathCmdLine, "db", dfltStore, "database store containing your notes")
+	globalFlags.StringVarP(&configPathArg, "config", "c", dfltConfig, "config file")
+	globalFlags.StringVar(&storagePathArg, "db", dfltStore, "database store containing your notes")
 
 	initFlags := initCmd.Flags()
-	initFlags.BoolVar(&force, "force", false, "determines if existing files will be overwritten")
+	initFlags.BoolVar(&forceArg, "force", false, "determines if existing files will be overwritten")
 
 	addFlags := addCmd.Flags()
 	_ = addFlags.StringP("space", "s", DefaultSpace, "partitions the note into a space")
-	addFlags.StringVarP(&file, "file", "f", "", "the note is read from file")
-	addFlags.BoolVarP(&pinned, "pinned", "p", false, "pin your note to the top")
+	addFlags.StringVarP(&fileArg, "file", "f", "", "the note is read from file")
+	addFlags.BoolVarP(&pinnedArg, "pinned", "p", false, "pin your note to the top")
 
 	sortKeys := getSortKeys()
 	sortUsage := fmt.Sprintf("column to sort notes by (%v)", sortKeys)
 	listFlags := listCmd.Flags()
 	_ = listFlags.StringSliceP("spaces", "s", []string{DefaultSpace}, "only show notes from space(s)")
-	listFlags.StringVarP(&sortBy, "sort", "S", "id", sortUsage)
-	listFlags.IntVarP(&limit, "limit", "l", 0, "limit amount of notes shown, 0 means no limit")
-	listFlags.IntVarP(&offset, "offset", "o", 0, "begin list notes at some offset")
-	listFlags.BoolVarP(&descending, "descending", "r", false, "descending order")
+	listFlags.StringVarP(&sortByArg, "sort", "S", "id", sortUsage)
+	listFlags.IntVarP(&limitArg, "limit", "l", 0, "limit amount of notes shown, 0 means no limit")
+	listFlags.IntVarP(&offsetArg, "offset", "o", 0, "begin list notes at some offset")
+	listFlags.BoolVarP(&descendingArg, "descending", "r", false, "descending order")
 
 	// These variables can exist in the config file or as environment variables as well
 	viper.BindPFlag("db", globalFlags.Lookup("db"))
@@ -139,7 +139,7 @@ func init() {
 
 func noteInit(cmd *cobra.Command, args []string) {
 	forceInform := false
-	dbF, err := filepath.Abs(storagePathCmdLine) // When doing init we explicitly want the command line option
+	dbF, err := filepath.Abs(storagePathArg) // When doing init we explicitly want the command line option
 	if err != nil {
 		quitError("db path", err)
 	}
@@ -149,21 +149,21 @@ func noteInit(cmd *cobra.Command, args []string) {
 	// the option from the config file.
 	viper.Set("db", dbF)
 
-	mkdir(filepath.Dir(configPath))
+	mkdir(filepath.Dir(configPathArg))
 	mkdir(filepath.Dir(dbF))
 
-	if !force && exists(configPath) {
+	if !forceArg && exists(configPathArg) {
 		fmt.Fprintln(os.Stderr, "Config file already exists")
 		forceInform = true
 	} else {
-		fmt.Printf("Writing config file: %v\n", configPath)
+		fmt.Printf("Writing config file: %v\n", configPathArg)
 		err := viper.WriteConfig()
 		if err != nil {
 			quitError("writing config", err)
 		}
 	}
 
-	if !force && exists(dbF) {
+	if !forceArg && exists(dbF) {
 		fmt.Fprintln(os.Stderr, "Storage file already exists")
 		forceInform = true
 	} else {
