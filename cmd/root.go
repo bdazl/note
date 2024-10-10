@@ -74,9 +74,8 @@ var (
 	force bool
 
 	// Add arguments
-	namespace string
-	file      string
-	pinned    bool
+	file   string
+	pinned bool
 
 	// List arguments
 	sortBy     string
@@ -109,21 +108,23 @@ func init() {
 	initFlags.BoolVar(&force, "force", false, "determines if existing files will be overwritten")
 
 	addFlags := addCmd.Flags()
-	addFlags.StringVarP(&namespace, "namespace", "n", "main", "partition the note into a namespace")
+	_ = addFlags.StringP("space", "s", DefaultSpace, "partitions the note into a space")
 	addFlags.StringVarP(&file, "file", "f", "", "the note is read from file")
 	addFlags.BoolVarP(&pinned, "pinned", "p", false, "pin your note to the top")
 
 	sortKeys := getSortKeys()
 	sortUsage := fmt.Sprintf("column to sort notes by (%v)", sortKeys)
 	listFlags := listCmd.Flags()
-	listFlags.StringVarP(&sortBy, "sort", "s", "id", sortUsage)
+	_ = listFlags.StringSliceP("spaces", "n", []string{DefaultSpace}, "only show notes from space(s)")
+	listFlags.StringVarP(&sortBy, "sort", "S", "id", sortUsage)
 	listFlags.IntVarP(&limit, "limit", "l", 0, "limit amount of notes shown, 0 means no limit")
 	listFlags.IntVarP(&offset, "offset", "o", 0, "begin list notes at some offset")
-	listFlags.BoolVarP(&descending, "descend", "r", false, "descending order")
+	listFlags.BoolVarP(&descending, "descending", "r", false, "descending order")
 
 	// These variables can exist in the config file or as environment variables as well
 	viper.BindPFlag("db", globalFlags.Lookup("db"))
-	viper.BindPFlag("namespace", addFlags.Lookup("namespace"))
+	viper.BindPFlag("add_space", addFlags.Lookup("space"))
+	viper.BindPFlag("ls_spaces", listFlags.Lookup("spaces"))
 
 	// TODO: It makes not sense to include all of lists arguments here
 	// rootCmd.Flags().AddFlagSet(listFlags)

@@ -23,6 +23,7 @@ package db
 
 import (
 	"fmt"
+	"strings"
 )
 
 const (
@@ -32,7 +33,7 @@ const (
 var (
 	validSortColumns = map[NoteColumn]bool{
 		ColumnID:        true,
-		ColumnNamespace: true,
+		ColumnSpace:     true,
 		ColumnCreatedAt: true,
 		ColumnUpdatedAt: true,
 		ColumnContent:   true,
@@ -40,37 +41,90 @@ var (
 	}
 )
 
-func (d *DB) ListNotes(sortBy NoteColumn, ascending bool, limit int, offset int) ([]Note, error) {
-	err := validSortColumn(sortBy)
-	if err != nil {
-		return nil, err
-	}
-	if limit < 0 {
-		return nil, fmt.Errorf("limit must be positive")
-	}
-	if offset < 0 {
-		return nil, fmt.Errorf("offset must be positive")
-	}
+type SortOpts struct {
+	Ascending  bool
+	SortColumn NoteColumn
+}
 
-	// Determine sort order
-	order := "ASC"
-	if !ascending {
-		order = "DESC"
+func DefaultSortOpts() SortOpts {
+	return SortOpts{
+		Ascending:  true,
+		SortColumn: ColumnID,
+	}
+}
+
+func (s *SortOpts) Check() error {
+	if !validSortColumns[s.SortColumn] {
+		return fmt.Errorf("invalid sort column: %v", s.SortColumn)
+	}
+	return nil
+}
+
+func (s *SortOpts) orderStr() string {
+	if s.Ascending {
+		return "ASC"
+	}
+	return "DESC"
+}
+
+type PageOpts struct {
+	Limit  int
+	Offset int
+}
+
+func DefaultPageOpts() PageOpts {
+	return PageOpts{}
+}
+
+func (p *PageOpts) Check() error {
+	if p.Limit < 0 {
+		return fmt.Errorf("limit must be positive")
+	} else if p.Limit == 0 && p.Offset > 0 {
+		return fmt.Errorf("if limit is zero, offset should be zero")
+	}
+	if p.Offset < 0 {
+		return fmt.Errorf("offset must be positive")
+	}
+	return nil
+}
+
+func (d *DB) ListNotes(spaces []string, sortOpts *SortOpts, pageOpts *PageOpts) ([]Note, error) {
+	var (
+		addParams     = []any{}
+		sortQueryAdd  = "ORDER BY is_pinned DESC" // By default we always sort pinned first
+		pageQueryAdd  = ""
+		spaceQueryAdd = ""
+	)
+	// Check input
+	if sortOpts != nil {
+		if err := sortOpts.Check(); err != nil {
+			return nil, err
+		}
+		order := sortOpts.orderStr()
+		sortColumn := string(sortOpts.SortColumn)
+		sortQueryAdd = fmt.Sprintf("ORDER BY is_pinned DESC, %v %v", sortColumn, order)
+	}
+	if pageOpts != nil {
+		if err := pageOpts.Check(); err != nil {
+			return nil, err
+		}
+		if pageOpts.Limit > 0 {
+			pageQueryAdd = "LIMIT ? OFFSET ?"
+			addParams = append(addParams, pageOpts.Limit)
+			addParams = append(addParams, pageOpts.Offset)
+		}
+	}
+	if len(spaces) > 0 {
+		spaceQueryAdd = spacesWhere(spaces)
+		for _, space := range spaces {
+			addParams = append(addParams, space)
+		}
 	}
 
 	// Prepare the SQL query
-	loff := ""
-	addParams := []any{}
-	if limit > 0 {
-		loff = "LIMIT ? OFFSET ?"
-		addParams = append(addParams, limit)
-		addParams = append(addParams, offset)
-	}
-	query := fmt.Sprintf(`
-        SELECT id, namespace, created_at, updated_at, content, is_pinned
-        FROM notes
-        ORDER BY %v %v
-        %v`, string(sortBy), order, loff,
+	query := fmt.Sprintf(
+		"SELECT id, space, created_at, updated_at, content, is_pinned FROM notes %v %v %v",
+		spaceQueryAdd, sortQueryAdd, pageQueryAdd,
 	)
 
 	// Execute the query
@@ -81,12 +135,12 @@ func (d *DB) ListNotes(sortBy NoteColumn, ascending bool, limit int, offset int)
 	defer rows.Close()
 
 	// Parse the results
-	notes := make([]Note, 0, limit)
+	notes := make([]Note, 0, pageOpts.Limit)
 	var dbN dbNote
 	for rows.Next() {
 		err := rows.Scan(
 			&dbN.ID,
-			&dbN.Namespace,
+			&dbN.Space,
 			&dbN.CreatedAt,
 			&dbN.UpdatedAt,
 			&dbN.Content,
@@ -106,9 +160,17 @@ func (d *DB) ListNotes(sortBy NoteColumn, ascending bool, limit int, offset int)
 	return notes, nil
 }
 
-func validSortColumn(col NoteColumn) error {
-	if !validSortColumns[col] {
-		return fmt.Errorf("invalid sort column: %v", col)
+func spacesWhere(spaces []string) string {
+	if len(spaces) == 0 {
+		return ""
 	}
-	return nil
+	bld := strings.Builder{}
+	bld.WriteString("WHERE ")
+	for i := range spaces {
+		if i > 0 {
+			bld.WriteString(" OR ")
+		}
+		bld.WriteString("space = ?")
+	}
+	return bld.String()
 }

@@ -30,8 +30,8 @@ import (
 // otherwise timestamps and other default values are set automatically.
 func (d *DB) AddNote(note Note, full bool) (int64, error) {
 	const (
-		smallQuery = "INSERT INTO notes (namespace, content, is_pinned) VALUES (?, ?, ?);"
-		fullQuery  = `INSERT INTO notes (namespace, created_at, updated_at, content, is_pinned)
+		smallQuery = "INSERT INTO notes (space, content, is_pinned) VALUES (?, ?, ?);"
+		fullQuery  = `INSERT INTO notes (space, created_at, updated_at, content, is_pinned)
 		VALUES (?, ?, ?, ?, ?);`
 	)
 	var (
@@ -43,7 +43,7 @@ func (d *DB) AddNote(note Note, full bool) (int64, error) {
 	if full {
 		query = fullQuery
 		params = []any{
-			dbN.Namespace,
+			dbN.Space,
 			dbN.CreatedAt,
 			dbN.UpdatedAt,
 			dbN.Content,
@@ -51,7 +51,7 @@ func (d *DB) AddNote(note Note, full bool) (int64, error) {
 		}
 	} else {
 		query = smallQuery
-		params = []any{dbN.Namespace, dbN.Content, dbN.IsPinned}
+		params = []any{dbN.Space, dbN.Content, dbN.IsPinned}
 	}
 
 	result, err := d.db.Exec(query, params...)

@@ -42,9 +42,9 @@ func noteAdd(cmd *cobra.Command, args []string) {
 	}
 
 	add := db.Note{
-		Namespace: namespace,
-		Content:   content,
-		IsPinned:  pinned,
+		Space:    viper.GetString(ViperAddSpace),
+		Content:  content,
+		IsPinned: pinned,
 	}
 
 	id, err := d.AddNote(add, false)

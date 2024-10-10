@@ -28,9 +28,9 @@ import (
 
 const (
 	ColumnID        NoteColumn = "id"
+	ColumnSpace     NoteColumn = "space"
 	ColumnCreatedAt NoteColumn = "created_at"
 	ColumnUpdatedAt NoteColumn = "updated_at"
-	ColumnNamespace NoteColumn = "namespace"
 	ColumnContent   NoteColumn = "content"
 	ColumnIsPinned  NoteColumn = "is_pinned"
 )
@@ -38,7 +38,7 @@ const (
 // Exported definition of a Note, in the DB
 type Note struct {
 	ID        int
-	Namespace string
+	Space     string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Content   string
@@ -50,7 +50,7 @@ type NoteColumn string
 // Internal representation of a note
 type dbNote struct {
 	ID        int
-	Namespace string
+	Space     string
 	CreatedAt string
 	UpdatedAt string
 	Content   string
@@ -72,7 +72,7 @@ func toNote(note dbNote) (*Note, error) {
 
 	return &Note{
 		ID:        note.ID,
-		Namespace: note.Namespace,
+		Space:     note.Space,
 		CreatedAt: createdAt,
 		UpdatedAt: updatedAt,
 		Content:   note.Content,
@@ -83,7 +83,7 @@ func toNote(note dbNote) (*Note, error) {
 func toDbNote(note Note) dbNote {
 	return dbNote{
 		ID:        note.ID,
-		Namespace: note.Namespace,
+		Space:     note.Space,
 		CreatedAt: note.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt: note.UpdatedAt.Format("2006-01-02 15:04:05"),
 		Content:   note.Content,

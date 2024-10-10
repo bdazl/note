@@ -27,21 +27,22 @@ import (
 
 	"github.com/bdazl/note/db"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"golang.org/x/exp/maps"
 )
 
 var (
 	validSortColumns = map[string]db.NoteColumn{
-		"id":        db.ColumnID,
-		"namespace": db.ColumnNamespace,
-		"content":   db.ColumnContent,
-		"created":   db.ColumnCreatedAt,
-		"updated":   db.ColumnCreatedAt,
+		"id":      db.ColumnID,
+		"space":   db.ColumnSpace,
+		"content": db.ColumnContent,
+		"created": db.ColumnCreatedAt,
+		"updated": db.ColumnCreatedAt,
 	}
 )
 
 func noteList(cmd *cobra.Command, args []string) {
-	sortColumn, err := checkSortArguments()
+	sortOpts, pageOpts, err := listOpts()
 	if err != nil {
 		quitError("args", err)
 	}
@@ -51,7 +52,9 @@ func noteList(cmd *cobra.Command, args []string) {
 		quitError("db open", err)
 	}
 
-	notes, err := d.ListNotes(sortColumn, !descending, limit, offset)
+	spaces := viper.GetStringSlice(ViperListSpaces)
+
+	notes, err := d.ListNotes(spaces, sortOpts, pageOpts)
 	if err != nil {
 		quitError("db list", err)
 	}
@@ -59,21 +62,26 @@ func noteList(cmd *cobra.Command, args []string) {
 	pprintNotes(notes)
 }
 
-func checkSortArguments() (db.NoteColumn, error) {
-	sortColumn, err := mapSortBy(sortBy)
+func listOpts() (*db.SortOpts, *db.PageOpts, error) {
+	sortColumn, err := mapSortColumn(sortBy)
 	if err != nil {
-		return "", err
+		return nil, nil, err
 	}
-
-	if limit < 0 {
-		return "", fmt.Errorf("limit must be zero or positive")
-	} else if limit == 0 && offset != 0 {
-		return "", fmt.Errorf("offset is only valid if you specify a limit")
-	} else if limit > 0 && offset < 0 {
-		return "", fmt.Errorf("offset must be zero or positive")
+	sortOpts := &db.SortOpts{
+		Ascending:  !descending,
+		SortColumn: sortColumn,
 	}
-
-	return sortColumn, nil
+	if err = sortOpts.Check(); err != nil {
+		return nil, nil, err
+	}
+	pageOpts := &db.PageOpts{
+		Limit:  limit,
+		Offset: offset,
+	}
+	if err = pageOpts.Check(); err != nil {
+		return nil, nil, err
+	}
+	return sortOpts, pageOpts, nil
 }
 
 func pprintNotes(notes []db.Note) {
@@ -82,7 +90,7 @@ func pprintNotes(notes []db.Note) {
 	}
 }
 
-func mapSortBy(s string) (db.NoteColumn, error) {
+func mapSortColumn(s string) (db.NoteColumn, error) {
 	out, ok := validSortColumns[s]
 	if !ok {
 		return "", fmt.Errorf("invalid sort option: %v", s)

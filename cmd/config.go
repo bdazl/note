@@ -29,6 +29,15 @@ import (
 	"github.com/spf13/viper"
 )
 
+const (
+	ViperDb         = "db"
+	ViperEditor     = "editor"
+	ViperAddSpace   = "add_space"
+	ViperListSpaces = "ls_spaces"
+
+	DefaultSpace = "main"
+)
+
 func initConfig() {
 	if configPath != "" {
 		viper.SetConfigFile(configPath)
@@ -48,8 +57,10 @@ func initConfig() {
 		quitError("init default store", err)
 	}
 
-	viper.SetDefault("db", dfltStore)
-	viper.SetDefault("editor", defaultEditor())
+	viper.SetDefault(ViperDb, dfltStore)
+	viper.SetDefault(ViperEditor, defaultEditor())
+	viper.SetDefault(ViperAddSpace, DefaultSpace)
+	viper.SetDefault(ViperListSpaces, []string{DefaultSpace})
 
 	viper.AutomaticEnv()
 
