@@ -94,6 +94,7 @@ func (d *DB) ListNotes(spaces []string, sortOpts *SortOpts, pageOpts *PageOpts) 
 		sortQueryAdd  = "ORDER BY is_pinned DESC" // By default we always sort pinned first
 		pageQueryAdd  = ""
 		spaceQueryAdd = ""
+		limit         = 0
 	)
 	// Check input
 	if sortOpts != nil {
@@ -113,6 +114,7 @@ func (d *DB) ListNotes(spaces []string, sortOpts *SortOpts, pageOpts *PageOpts) 
 			addParams = append(addParams, pageOpts.Limit)
 			addParams = append(addParams, pageOpts.Offset)
 		}
+		limit = pageOpts.Limit
 	}
 	if len(spaces) > 0 {
 		spaceQueryAdd = spacesWhere(spaces)
@@ -135,7 +137,7 @@ func (d *DB) ListNotes(spaces []string, sortOpts *SortOpts, pageOpts *PageOpts) 
 	defer rows.Close()
 
 	// Parse the results
-	notes := make([]Note, 0, pageOpts.Limit)
+	notes := make([]Note, 0, limit)
 	var dbN dbNote
 	for rows.Next() {
 		err := rows.Scan(
