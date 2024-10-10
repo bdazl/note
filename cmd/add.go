@@ -36,6 +36,11 @@ import (
 func noteAdd(cmd *cobra.Command, args []string) {
 	content := produceNote(args)
 
+	space := viper.GetString(ViperAddSpace)
+	if err := checkSpaceArgument(space); err != nil {
+		quitError("arg", err)
+	}
+
 	d, err := db.Open(dbFilename())
 	if err != nil {
 		quitError("db open", err)
@@ -117,6 +122,13 @@ func openInEditor() (string, error) {
 	}
 
 	return string(content), nil
+}
+
+func checkSpaceArgument(space string) error {
+	if strings.Contains(space, ",") {
+		return fmt.Errorf("space cannot contain the following character ','")
+	}
+	return nil
 }
 
 func checkAddArguments(args []string) (*os.File, error) {
