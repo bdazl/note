@@ -65,6 +65,11 @@ var (
 		Short:   "Prints some or all of your notes",
 		Run:     noteList,
 	}
+	spacesCmd = &cobra.Command{
+		Use:   "spaces",
+		Short: "Prints all spaces that holds notes",
+		Run:   noteSpaces,
+	}
 
 	// Global arguments
 	configPath         string
@@ -129,7 +134,7 @@ func init() {
 	// TODO: It makes not sense to include all of lists arguments here
 	// rootCmd.Flags().AddFlagSet(listFlags)
 
-	rootCmd.AddCommand(initCmd, addCmd, rmCmd, listCmd)
+	rootCmd.AddCommand(initCmd, addCmd, rmCmd, listCmd, spacesCmd)
 }
 
 func noteInit(cmd *cobra.Command, args []string) {

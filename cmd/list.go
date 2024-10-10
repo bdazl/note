@@ -62,6 +62,21 @@ func noteList(cmd *cobra.Command, args []string) {
 	pprintNotes(notes)
 }
 
+func noteSpaces(cmd *cobra.Command, args []string) {
+	d, err := db.Open(dbFilename())
+	if err != nil {
+		quitError("db open", err)
+	}
+
+	spaces, err := d.ListSpaces()
+	if err != nil {
+		quitError("db list", err)
+	}
+
+	spacesStr := strings.Join(spaces, " ")
+	fmt.Println(spacesStr)
+}
+
 func listOpts() (*db.SortOpts, *db.PageOpts, error) {
 	sortColumn, err := mapSortColumn(sortBy)
 	if err != nil {

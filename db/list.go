@@ -160,6 +160,25 @@ func (d *DB) ListNotes(spaces []string, sortOpts *SortOpts, pageOpts *PageOpts) 
 	return notes, nil
 }
 
+func (d *DB) ListSpaces() ([]string, error) {
+	rows, err := d.db.Query("SELECT DISTINCT space FROM notes")
+	if err != nil {
+		return nil, fmt.Errorf("query error: %w", err)
+	}
+	defer rows.Close()
+
+	spaces := make([]string, 0)
+	for rows.Next() {
+		var space string
+		err := rows.Scan(&space)
+		if err != nil {
+			return nil, fmt.Errorf("row scan error: %w", err)
+		}
+		spaces = append(spaces, space)
+	}
+	return spaces, nil
+}
+
 func spacesWhere(spaces []string) string {
 	if len(spaces) == 0 {
 		return ""
