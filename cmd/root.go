@@ -120,7 +120,7 @@ func init() {
 	sortKeys := getSortKeys()
 	sortUsage := fmt.Sprintf("column to sort notes by (%v)", sortKeys)
 	listFlags := listCmd.Flags()
-	_ = listFlags.StringSliceP("spaces", "n", []string{DefaultSpace}, "only show notes from space(s)")
+	_ = listFlags.StringSliceP("spaces", "s", []string{DefaultSpace}, "only show notes from space(s)")
 	listFlags.StringVarP(&sortBy, "sort", "S", "id", sortUsage)
 	listFlags.IntVarP(&limit, "limit", "l", 0, "limit amount of notes shown, 0 means no limit")
 	listFlags.IntVarP(&offset, "offset", "o", 0, "begin list notes at some offset")
