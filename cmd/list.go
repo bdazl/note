@@ -44,7 +44,7 @@ var (
 func noteList(cmd *cobra.Command, args []string) {
 	notes, err := collectNotes()
 	if err != nil {
-		quitError("collect", err)
+		quitError("collect notes", err)
 	}
 
 	pprintNotes(notes)
