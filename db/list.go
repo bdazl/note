@@ -117,7 +117,7 @@ func (d *DB) ListNotes(spaces []string, sortOpts *SortOpts, pageOpts *PageOpts) 
 		limit = pageOpts.Limit
 	}
 	if len(spaces) > 0 {
-		spaceQueryAdd = spacesWhere(spaces)
+		spaceQueryAdd = spacesWhere(len(spaces))
 		for _, space := range spaces {
 			addParams = append(addParams, space)
 		}
@@ -181,17 +181,24 @@ func (d *DB) ListSpaces() ([]string, error) {
 	return spaces, nil
 }
 
-func spacesWhere(spaces []string) string {
-	if len(spaces) == 0 {
+func spacesWhere(count int) string {
+	if count < 1 {
 		return ""
 	}
-	bld := strings.Builder{}
-	bld.WriteString("WHERE ")
-	for i := range spaces {
+	return fmt.Sprintf("WHERE %v", equalOrChain("space", count))
+}
+
+func equalOrChain(lhs string, count int) string {
+	var (
+		bld      = strings.Builder{}
+		orStmt   = " OR "
+		mainStmt = fmt.Sprintf("%v = ?", lhs)
+	)
+	for i := 0; i < count; i++ {
 		if i > 0 {
-			bld.WriteString(" OR ")
+			bld.WriteString(orStmt)
 		}
-		bld.WriteString("space = ?")
+		bld.WriteString(mainStmt)
 	}
 	return bld.String()
 }
