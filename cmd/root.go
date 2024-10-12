@@ -61,6 +61,12 @@ var (
 		Args:    cobra.MinimumNArgs(1),
 		Run:     noteRemove,
 	}
+	editCmd = &cobra.Command{
+		Use:   "edit id",
+		Short: "Edit content of note",
+		Args:  cobra.MinimumNArgs(1),
+		Run:   noteEdit,
+	}
 	moveCmd = &cobra.Command{
 		Use:     "move id toSpace",
 		Aliases: []string{"mv"},
@@ -169,7 +175,7 @@ func init() {
 	rootCmd.AddCommand(
 		initCmd,
 		addCmd, removeCmd,
-		moveCmd,
+		editCmd, moveCmd,
 		listCmd, spacesCmd,
 		exportCmd,
 	)
@@ -234,7 +240,13 @@ func exists(path string) bool {
 }
 
 func quitError(loc string, err error) {
-	msg := fmt.Sprintf("error %v: %v", loc, err)
-	fmt.Fprintln(os.Stderr, msg)
+	stderr := fmt.Sprintf("error %v: %v", loc, err)
+	fmt.Fprintln(os.Stderr, stderr)
+	os.Exit(1)
+}
+
+func quit(msg string) {
+	stderr := fmt.Sprintf("error: %v", msg)
+	fmt.Fprintln(os.Stderr, stderr)
 	os.Exit(1)
 }

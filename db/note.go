@@ -23,6 +23,7 @@ package db
 
 import (
 	"database/sql"
+	"strings"
 	"time"
 )
 
@@ -33,6 +34,10 @@ const (
 	ColumnUpdatedAt NoteColumn = "updated_at"
 	ColumnContent   NoteColumn = "content"
 	ColumnIsPinned  NoteColumn = "is_pinned"
+)
+
+var (
+	allNoteColumns = allNoteColumnsGen()
 )
 
 // Exported definition of a Note, in the DB
@@ -57,7 +62,21 @@ type dbNote struct {
 	IsPinned  bool
 }
 
-// Conversion helpers
+// Helpers
+
+func allNoteColumnsGen() string {
+	// id, space, created_at, updated_at, content, is_pinned
+	cols := []string{
+		string(ColumnID),
+		string(ColumnSpace),
+		string(ColumnCreatedAt),
+		string(ColumnUpdatedAt),
+		string(ColumnContent),
+		string(ColumnIsPinned),
+	}
+
+	return strings.Join(cols, ", ")
+}
 
 func toNote(note dbNote) (*Note, error) {
 	createdAt, err := parseTime(note.CreatedAt)

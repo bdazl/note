@@ -125,8 +125,8 @@ func (d *DB) ListNotes(spaces []string, sortOpts *SortOpts, pageOpts *PageOpts) 
 
 	// Prepare the SQL query
 	query := fmt.Sprintf(
-		"SELECT id, space, created_at, updated_at, content, is_pinned FROM notes %v %v %v",
-		spaceQueryAdd, sortQueryAdd, pageQueryAdd,
+		"SELECT %v FROM notes %v %v %v",
+		allNoteColumns, spaceQueryAdd, sortQueryAdd, pageQueryAdd,
 	)
 
 	// Execute the query
@@ -138,25 +138,12 @@ func (d *DB) ListNotes(spaces []string, sortOpts *SortOpts, pageOpts *PageOpts) 
 
 	// Parse the results
 	notes := make([]Note, 0, limit)
-	var dbN dbNote
 	for rows.Next() {
-		err := rows.Scan(
-			&dbN.ID,
-			&dbN.Space,
-			&dbN.CreatedAt,
-			&dbN.UpdatedAt,
-			&dbN.Content,
-			&dbN.IsPinned,
-		)
-		if err != nil {
-			return nil, fmt.Errorf("row scan error: %w", err)
+		note, err := scanNote(rows)
+		if err != err {
+			return nil, err
 		}
-		nOut, err := toNote(dbN)
-		if err != nil {
-			return nil, fmt.Errorf("row conversion error: %w", err)
-		}
-
-		notes = append(notes, *nOut)
+		notes = append(notes, *note)
 	}
 
 	return notes, nil

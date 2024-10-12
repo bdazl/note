@@ -21,30 +21,42 @@ THE SOFTWARE.
 */
 package db
 
-import "fmt"
+import (
+	"fmt"
+)
 
-func (d *DB) ReplaceContent(id int, content string) error {
-	return d.updateRow("UPDATE notes SET content = ? WHERE id = ?", content, id)
+type Scanner interface {
+	Scan(dest ...any) error
 }
 
-func (d *DB) MoveNote(id int, toSpace string) error {
-	return d.updateRow("UPDATE notes SET space = ? WHERE id = ?", toSpace, id)
+func (d *DB) GetNote(id int) (*Note, error) {
+	query := fmt.Sprintf("SELECT %v FROM notes WHERE id = ?", allNoteColumns)
+	row := d.db.QueryRow(query, id)
+
+	note, err := scanNote(row)
+	if err != nil {
+		return nil, err
+	}
+
+	return note, nil
 }
 
-func (d *DB) updateRow(query string, args ...any) error {
-	result, err := d.db.Exec(query, args...)
+func scanNote(scanner Scanner) (*Note, error) {
+	var dbN dbNote
+	err := scanner.Scan(
+		&dbN.ID,
+		&dbN.Space,
+		&dbN.CreatedAt,
+		&dbN.UpdatedAt,
+		&dbN.Content,
+		&dbN.IsPinned,
+	)
 	if err != nil {
-		return fmt.Errorf("exec: %w", err)
+		return nil, fmt.Errorf("scan error: %w", err)
 	}
-
-	rows, err := result.RowsAffected()
+	out, err := toNote(dbN)
 	if err != nil {
-		return fmt.Errorf("rows: %w", err)
+		return nil, fmt.Errorf("conversion error: %w", err)
 	}
-
-	if rows != 1 {
-		return fmt.Errorf("nothing was modified")
-	}
-
-	return nil
+	return out, nil
 }
