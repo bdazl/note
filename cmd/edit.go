@@ -57,6 +57,11 @@ func noteEdit(cmd *cobra.Command, args []string) {
 		quitError("open in editor", err)
 	}
 
+	if edited == note.Content {
+		fmt.Fprintln(os.Stderr, "No changes")
+		os.Exit(2)
+	}
+
 	if err = d.ReplaceContent(note.ID, edited); err != err {
 		quitError("db replace", err)
 	}
