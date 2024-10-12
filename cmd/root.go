@@ -55,9 +55,10 @@ var (
 		Run:   noteAdd,
 	}
 	removeCmd = &cobra.Command{
-		Use:     "remove [id...]",
+		Use:     "remove id [id...]",
 		Aliases: []string{"rm", "del"},
 		Short:   "Remove note(s) with id(s)",
+		Args:    cobra.MinimumNArgs(1),
 		Run:     noteRemove,
 	}
 	moveCmd = &cobra.Command{

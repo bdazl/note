@@ -40,10 +40,8 @@ func noteRemove(cmd *cobra.Command, args []string) {
 		quitError("db open", err)
 	}
 
-	for _, id := range ids {
-		if err := d.RemoveNote(id); err != nil {
-			quitError("db remove", err)
-		}
+	if err := d.RemoveNotes(ids); err != nil {
+		quitError("db remove", err)
 	}
 }
 

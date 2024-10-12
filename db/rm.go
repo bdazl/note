@@ -25,22 +25,36 @@ import (
 	"fmt"
 )
 
-func (d *DB) RemoveNote(id int) error {
-	query := "DELETE FROM notes WHERE id = ?"
+func (d *DB) RemoveNotes(ids []int) error {
+	var (
+		count = len(ids)
+	)
+	if count < 1 {
+		return fmt.Errorf("must provide ids")
+	}
 
-	result, err := d.db.Exec(query, id)
+	query := fmt.Sprintf("DELETE FROM notes WHERE %v", equalOrChain("id", count))
+	result, err := d.db.Exec(query, sliceToAny(ids)...)
 	if err != nil {
-		return err
+		return fmt.Errorf("exec: %w", err)
 	}
 
 	rows, err := result.RowsAffected()
 	if err != nil {
-		return err
+		return fmt.Errorf("rows: %w", err)
 	}
 
-	if rows != 1 {
+	if rows != int64(count) {
 		return fmt.Errorf("nothing was deleted")
 	}
 
 	return nil
+}
+
+func sliceToAny[T any](s []T) []any {
+	result := make([]any, len(s))
+	for i, v := range s {
+		result[i] = v
+	}
+	return result
 }
