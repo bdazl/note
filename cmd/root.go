@@ -60,6 +60,13 @@ var (
 		Short:   "Remove note(s) with id(s)",
 		Run:     noteRemove,
 	}
+	moveCmd = &cobra.Command{
+		Use:     "move id toSpace",
+		Aliases: []string{"mv"},
+		Short:   "Move note to other space",
+		Args:    cobra.MinimumNArgs(2),
+		Run:     noteMove,
+	}
 	listCmd = &cobra.Command{
 		Use:     "list",
 		Aliases: []string{"ls"},
@@ -158,7 +165,13 @@ func init() {
 	viper.BindPFlag("add_space", addFlags.Lookup("space"))
 	viper.BindPFlag("ls_spaces", listFlags.Lookup("spaces"))
 
-	rootCmd.AddCommand(initCmd, addCmd, removeCmd, listCmd, spacesCmd, exportCmd)
+	rootCmd.AddCommand(
+		initCmd,
+		addCmd, removeCmd,
+		moveCmd,
+		listCmd, spacesCmd,
+		exportCmd,
+	)
 }
 
 func noteInit(cmd *cobra.Command, args []string) {
