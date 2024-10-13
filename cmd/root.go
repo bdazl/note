@@ -71,6 +71,12 @@ var (
 		Args:  cobra.MinimumNArgs(1),
 		Run:   noteEdit,
 	}
+	pinCmd = &cobra.Command{
+		Use:   "pin id [id...]",
+		Short: "Pin note(s) to top",
+		Args:  cobra.MinimumNArgs(1),
+		Run:   notePin,
+	}
 	moveCmd = &cobra.Command{
 		Use:     "move id toSpace",
 		Aliases: []string{"mv"},
@@ -199,7 +205,7 @@ func init() {
 		initCmd,
 		addCmd, removeCmd,
 		getCmd, listCmd, spacesCmd,
-		editCmd, moveCmd,
+		editCmd, pinCmd, moveCmd,
 		exportCmd,
 	)
 }

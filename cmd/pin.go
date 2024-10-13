@@ -19,40 +19,32 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package db
+package cmd
 
 import (
 	"fmt"
+
+	"github.com/spf13/cobra"
 )
 
-func (d *DB) RemoveNotes(ids []int) error {
-	count := len(ids)
-	if count < 1 {
-		return fmt.Errorf("must provide ids")
-	}
-
-	query := fmt.Sprintf("DELETE FROM notes WHERE %v", equalOrChain("id", count))
-	result, err := d.db.Exec(query, sliceToAny(ids)...)
+func notePin(cmd *cobra.Command, args []string) {
+	ids, err := parseIds(args)
 	if err != nil {
-		return fmt.Errorf("exec: %w", err)
+		quitError("parse ids", err)
 	}
 
-	rows, err := result.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("rows: %w", err)
+	db := dbOpen()
+	defer db.Close()
+
+	uniqueIds := removeDuplicates(ids)
+	if err = db.PinNotes(uniqueIds); err != nil {
+		quitError("db pin", err)
 	}
 
-	if rows != int64(count) {
-		return fmt.Errorf("only %v out of %v was deleted successfully", rows, count)
+	count := len(uniqueIds)
+	if count == 1 {
+		fmt.Println("Note pinned")
+	} else {
+		fmt.Printf("%v notes pinned", count)
 	}
-
-	return nil
-}
-
-func sliceToAny[T any](s []T) []any {
-	result := make([]any, len(s))
-	for i, v := range s {
-		result[i] = v
-	}
-	return result
 }
