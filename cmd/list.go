@@ -154,8 +154,9 @@ func printNotesPlain(notes []db.Note) {
 
 func printNotesTitle(notes []db.Note, doColor bool) {
 	var (
-		col = color.New(color.FgGreen)
+		green = color.New(color.FgGreen)
 
+		pin     = "\U0001F4CC"
 		boxThin = '\u2500'
 		line    = strings.Repeat(string(boxThin), 4)
 	)
@@ -168,10 +169,15 @@ func printNotesTitle(notes []db.Note, doColor bool) {
 	}
 
 	for _, n := range notes {
+		pinned := ""
+		if n.Pinned {
+			pinned = pin
+		}
 		if doColor {
-			col.Printf("%s [", line)
+			green.Printf("%s [", line)
 			fmt.Printf("%v", n.ID)
-			col.Printf("] %s\n", line)
+			green.Printf("] %s", line)
+			fmt.Printf(" %s\n", pinned)
 		} else {
 			fmt.Printf("%s [%v] %s\n", line, n.ID, line)
 		}
