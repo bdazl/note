@@ -24,7 +24,6 @@ package cmd
 import (
 	"fmt"
 	"io"
-	"os"
 	"strings"
 
 	"github.com/bdazl/note/db"
@@ -58,29 +57,28 @@ func noteAdd(cmd *cobra.Command, args []string) {
 }
 
 func produceNote(args []string) string {
-	fileptr, err := checkAddArguments(args)
+	reader, err := checkAddArguments(args)
 	if err != nil {
 		quitError("args", err)
 	}
 
 	// Any fileptr takes precedence and we know from the arg check that len(args) == 0
-	if fileptr != nil {
-		data, err := io.ReadAll(fileptr)
-		if err != nil {
-			quitError("read file", err)
-		}
-		return string(data)
+	if reader != nil {
+		defer reader.Close()
+		return readAll(reader)
 	}
 
-	if len(args) == 0 {
-		note, err := openInEditor("")
-		if err != nil {
-			quitError("open editor", err)
-		}
-		return note
+	// If there are arguments, interpret them as strings with spaces in between
+	if len(args) != 0 {
+		return strings.Join(args, " ")
 	}
 
-	return strings.Join(args, " ")
+	// Special case, where no arguments means open an editor to create the note
+	note, err := openInEditor("")
+	if err != nil {
+		quitError("open editor", err)
+	}
+	return note
 }
 
 func checkSpaceArgument(space string) error {
@@ -90,16 +88,12 @@ func checkSpaceArgument(space string) error {
 	return nil
 }
 
-func checkAddArguments(args []string) (*os.File, error) {
+func checkAddArguments(args []string) (io.ReadCloser, error) {
 	if fileArg == "" {
 		return nil, nil
 	}
-	// file != ""
 	if len(args) > 0 {
 		return nil, fmt.Errorf("you can't specify both --file and positional arguments")
 	}
-	if fileArg == "-" {
-		return os.Stdin, nil
-	}
-	return os.Open(fileArg)
+	return openFile(fileArg)
 }

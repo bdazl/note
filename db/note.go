@@ -40,6 +40,8 @@ var (
 	allNoteColumns = allNoteColumnsGen()
 )
 
+type Column string
+
 // Exported definition of a Note, in the DB
 type Note struct {
 	ID         int
@@ -50,7 +52,15 @@ type Note struct {
 	Pinned     bool
 }
 
-type Column string
+type Notes []Note
+
+func (n Notes) GetIDs() []int {
+	out := make([]int, len(n))
+	for n, note := range n {
+		out[n] = note.ID
+	}
+	return out
+}
 
 // Internal representation of a note
 type dbNote struct {

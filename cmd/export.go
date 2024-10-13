@@ -24,8 +24,6 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"io"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -39,8 +37,6 @@ const (
 	UnknownFormat FileFormat = iota
 	JSONFormat
 	YAMLFormat
-
-	StdoutPath = ""
 )
 
 type FileFormat int
@@ -55,7 +51,20 @@ type FileNote struct {
 }
 
 func noteExport(cmd *cobra.Command, args []string) {
-	path, format := filePathAndFormat(args)
+	argFmt, err := cmdArgFormat()
+	if err != nil {
+		quitError("cmd arg fmt", err)
+	}
+
+	path, fileFmt, err := exportFilePathAndFormat(args)
+	if err != nil {
+		quitError("path arg", err)
+	}
+
+	format, err := combinedFormat(argFmt, fileFmt)
+	if err != nil {
+		quitError("file format", err)
+	}
 
 	notes, err := collectNotes()
 	if err != nil {
@@ -64,7 +73,7 @@ func noteExport(cmd *cobra.Command, args []string) {
 
 	fileNotes := convFileNotes(notes)
 
-	writer, err := openWriter(path)
+	writer, err := createFileOrStdout(path)
 	if err != nil {
 		quitError("open writer", err)
 	}
@@ -85,7 +94,7 @@ func noteExport(cmd *cobra.Command, args []string) {
 	}
 }
 
-func convFileNotes(notes []db.Note) []FileNote {
+func convFileNotes(notes db.Notes) []FileNote {
 	converted := make([]FileNote, len(notes))
 	for i, note := range notes {
 		converted[i] = FileNote{
@@ -100,43 +109,18 @@ func convFileNotes(notes []db.Note) []FileNote {
 	return converted
 }
 
-func fileFormatAndPath(args []string) (FileFormat, string, error) {
+func exportFilePathAndFormat(args []string) (string, FileFormat, error) {
 	if len(args) == 0 {
-		return UnknownFormat, StdoutPath, nil
+		return StdoutPath, UnknownFormat, nil
 	} else if len(args) != 1 {
-		return UnknownFormat, "", fmt.Errorf("must only contain one positional argument")
+		return "", UnknownFormat, fmt.Errorf("must only contain one positional argument")
 	}
 
 	path := args[0]
 	if forceArg && exists(path) {
-		return UnknownFormat, "", fmt.Errorf("file already exist")
+		return "", UnknownFormat, fmt.Errorf("file already exist")
 	}
-	return filenameFormat(path), path, nil
-}
-
-func openWriter(path string) (io.WriteCloser, error) {
-	if path == StdoutPath {
-		return os.Stdout, nil
-	}
-	return os.Create(path)
-}
-
-func filePathAndFormat(args []string) (string, FileFormat) {
-	argFmt, err := cmdArgFormat()
-	if err != nil {
-		quitError("cmd arg fmt", err)
-	}
-
-	fileFmt, path, err := fileFormatAndPath(args)
-	if err != nil {
-		quitError("path arg", err)
-	}
-
-	format, err := combinedFormat(argFmt, fileFmt)
-	if err != nil {
-		quitError("file format", err)
-	}
-	return path, format
+	return path, filenameFormat(path), nil
 }
 
 func combinedFormat(argFmt, fileFmt FileFormat) (FileFormat, error) {

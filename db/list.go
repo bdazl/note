@@ -88,7 +88,7 @@ func (p *PageOpts) Check() error {
 	return nil
 }
 
-func (d *DB) ListNotes(spaces []string, sortOpts *SortOpts, pageOpts *PageOpts) ([]Note, error) {
+func (d *DB) ListNotes(spaces []string, sortOpts *SortOpts, pageOpts *PageOpts) (Notes, error) {
 	var (
 		addParams     = []any{}
 		sortQueryAdd  = "ORDER BY pinned DESC" // By default we always sort pinned first
@@ -137,7 +137,7 @@ func (d *DB) ListNotes(spaces []string, sortOpts *SortOpts, pageOpts *PageOpts) 
 	defer rows.Close()
 
 	// Parse the results
-	notes := make([]Note, 0, limit)
+	notes := make(Notes, 0, limit)
 	for rows.Next() {
 		note, err := scanNote(rows)
 		if err != err {

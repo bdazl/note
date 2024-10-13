@@ -102,6 +102,13 @@ var (
 		Short:   "Prints all spaces that holds notes",
 		Run:     noteSpaces,
 	}
+	importCmd = &cobra.Command{
+		Use:     "import file [file...]",
+		Aliases: []string{"imp"},
+		Short:   "Import notes from JSON or YAML file",
+		Args:    cobra.MinimumNArgs(1),
+		Run:     noteImport,
+	}
 	exportCmd = &cobra.Command{
 		Use:     "export",
 		Aliases: []string{"exp"},
@@ -132,7 +139,7 @@ var (
 	// Spaces arguments
 	listArg bool
 
-	// Export arguments
+	// Import/Export arguments
 	jsonArg       bool
 	yamlArg       bool
 	jsonIndentArg string
@@ -194,11 +201,20 @@ func init() {
 	spacesFlags.BoolVarP(&listArg, "list", "l", false, "separate each space with a newline")
 	spacesFlags.BoolVarP(&descendingArg, "descending", "d", false, "descending order")
 
+	inoutFlagSet := pflag.NewFlagSet("inout", pflag.ExitOnError)
+	inoutFlagSet.BoolVarP(&jsonArg, "json", "j", false, "JSON format")
+	inoutFlagSet.BoolVarP(&yamlArg, "yaml", "y", false, "YAML format")
+
+	importFlags := importCmd.Flags()
+	importFlags.AddFlagSet(inoutFlagSet)
+	importForceUsage := "all input files will use the format specified by either --json or --yaml"
+	importFlags.BoolVarP(&listArg, "list", "l", false, "separate each id imported with a newline")
+	importFlags.BoolVar(&forceArg, "force-format", false, importForceUsage)
+
 	exportFlags := exportCmd.Flags()
 	exportFlags.AddFlagSet(collectFlagSet)
+	exportFlags.AddFlagSet(inoutFlagSet)
 	exportFlags.BoolVar(&forceArg, "force", false, "determines if existing file will be overwritten")
-	exportFlags.BoolVarP(&jsonArg, "json", "j", false, "export notes in JSON format")
-	exportFlags.BoolVarP(&yamlArg, "yaml", "y", false, "export notes in YAML format")
 	exportFlags.StringVarP(&jsonIndentArg, "indent", "i", "", "JSON indentation encoding option")
 	exportFlags.StringVarP(&jsonPrefixArg, "prefix", "p", "", "JSON prefix encoding option")
 	exportFlags.IntVarP(&yamlSpacesArg, "yaml-spaces", "P", 4, "YAML spaces encoding option")
@@ -213,7 +229,7 @@ func init() {
 		addCmd, removeCmd,
 		getCmd, listCmd, spacesCmd,
 		editCmd, pinCmd, unpinCmd, moveCmd,
-		exportCmd,
+		importCmd, exportCmd,
 	)
 }
 

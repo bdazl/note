@@ -24,11 +24,9 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"strconv"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 func noteEdit(cmd *cobra.Command, args []string) {
@@ -64,54 +62,6 @@ func noteEdit(cmd *cobra.Command, args []string) {
 	}
 
 	fmt.Println("Note modified")
-}
-
-func openInEditor(initText string) (string, error) {
-	// Create a temporary file
-	tmpFile, err := os.CreateTemp("", "note.*.txt")
-	if err != nil {
-		return "", fmt.Errorf("failed to create temp file: %w", err)
-	}
-	defer os.Remove(tmpFile.Name()) // Ensure the file is removed
-
-	// Write initial text to temp file, if any
-	if initText != "" {
-		_, err := tmpFile.WriteString(initText)
-		if err != nil {
-			return "", fmt.Errorf("failed to write to temp file: %w", err)
-		}
-	}
-
-	// Close the file so the editor can open it
-	if err := tmpFile.Close(); err != nil {
-		return "", fmt.Errorf("failed to close temp file: %w", err)
-	}
-
-	// Get the editor from configuration or environment
-	editor := viper.GetString("editor")
-
-	// Open the file with the editor
-	cmd := exec.Command(editor, tmpFile.Name())
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	if err := cmd.Run(); err != nil {
-		return "", fmt.Errorf("failed to open editor: %w", err)
-	}
-
-	// Read what the user wrote
-	content, err := os.ReadFile(tmpFile.Name())
-	if err != nil {
-		return "", fmt.Errorf("failed to read file after close: %w", err)
-	}
-
-	// If nothing exists in the file we always consider it an error
-	if len(content) == 0 {
-		return "", fmt.Errorf("empty file")
-	}
-
-	return string(content), nil
 }
 
 func checkEdit(args []string) (int, error) {

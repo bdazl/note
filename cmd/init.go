@@ -73,18 +73,3 @@ func noteInit(cmd *cobra.Command, args []string) {
 		fmt.Fprintln(os.Stderr, "If you want to force re-create them, consider using the --force flag")
 	}
 }
-
-func mkdir(path string) {
-	err := os.MkdirAll(path, os.ModePerm)
-	if err != nil {
-		quitError("mkdir", err)
-	}
-}
-
-func exists(path string) bool {
-	_, err := os.Stat(path)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return err == nil
-}

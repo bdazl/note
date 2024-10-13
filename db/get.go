@@ -45,7 +45,7 @@ func (d *DB) GetNote(id int) (*Note, error) {
 	return note, nil
 }
 
-func (d *DB) GetNotes(ids []int) ([]Note, error) {
+func (d *DB) GetNotes(ids []int) (Notes, error) {
 	count := len(ids)
 	if count < 1 {
 		return nil, fmt.Errorf("require at least one id")
@@ -76,7 +76,7 @@ func (d *DB) GetNotes(ids []int) ([]Note, error) {
 	defer rows.Close()
 
 	// Parse results
-	notes := make([]Note, 0)
+	notes := make(Notes, 0)
 	for rows.Next() {
 		note, err := scanNote(rows)
 		if err != err {
@@ -87,7 +87,7 @@ func (d *DB) GetNotes(ids []int) ([]Note, error) {
 
 	// If we did not get all id's, figure out which ones where not found
 	if len(notes) != count {
-		outIds := idsFromNotes(notes)
+		outIds := notes.GetIDs()
 		diff := difference(ids, outIds)
 		idStrs := manyIntToString(diff)
 		joined := strings.Join(idStrs, ", ")
@@ -155,14 +155,6 @@ func difference(full, subset []int) []int {
 		if !slices.Contains(subset, lhs) {
 			out = append(out, lhs)
 		}
-	}
-	return out
-}
-
-func idsFromNotes(notes []Note) []int {
-	out := make([]int, len(notes))
-	for n, note := range notes {
-		out[n] = note.ID
 	}
 	return out
 }

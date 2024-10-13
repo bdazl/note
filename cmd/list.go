@@ -94,7 +94,7 @@ func styleColorOpts() (Style, bool, error) {
 	return style, doColor, nil
 }
 
-func collectNotes() ([]db.Note, error) {
+func collectNotes() (db.Notes, error) {
 	sortOpts, pageOpts, err := listOpts()
 	if err != nil {
 		return nil, fmt.Errorf("args: %w", err)
@@ -137,7 +137,7 @@ func listOpts() (*db.SortOpts, *db.PageOpts, error) {
 	return sortOpts, pageOpts, nil
 }
 
-func pprintNotes(notes []db.Note, style Style, doColor bool) {
+func pprintNotes(notes db.Notes, style Style, doColor bool) {
 	switch style {
 	case PlainStyle:
 		printNotesPlain(notes)
@@ -146,13 +146,13 @@ func pprintNotes(notes []db.Note, style Style, doColor bool) {
 	}
 }
 
-func printNotesPlain(notes []db.Note) {
+func printNotesPlain(notes db.Notes) {
 	for _, n := range notes {
 		fmt.Printf(n.Content)
 	}
 }
 
-func printNotesTitle(notes []db.Note, doColor bool) {
+func printNotesTitle(notes db.Notes, doColor bool) {
 	var (
 		green = color.New(color.FgGreen)
 
