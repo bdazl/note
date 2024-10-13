@@ -55,20 +55,7 @@ type FileNote struct {
 }
 
 func noteExport(cmd *cobra.Command, args []string) {
-	argFmt, err := cmdArgFormat()
-	if err != nil {
-		quitError("cmd arg fmt", err)
-	}
-
-	fileFmt, path, err := fileFormatAndPath(args)
-	if err != nil {
-		quitError("path arg", err)
-	}
-
-	format, err := combinedFormat(argFmt, fileFmt)
-	if err != nil {
-		quitError("file format", err)
-	}
+	path, format := filePathAndFormat(args)
 
 	notes, err := collectNotes()
 	if err != nil {
@@ -124,7 +111,7 @@ func fileFormatAndPath(args []string) (FileFormat, string, error) {
 	if forceArg && exists(path) {
 		return UnknownFormat, "", fmt.Errorf("file already exist")
 	}
-	return determineFileFormat(path), path, nil
+	return filenameFormat(path), path, nil
 }
 
 func openWriter(path string) (io.WriteCloser, error) {
@@ -132,6 +119,24 @@ func openWriter(path string) (io.WriteCloser, error) {
 		return os.Stdout, nil
 	}
 	return os.Create(path)
+}
+
+func filePathAndFormat(args []string) (string, FileFormat) {
+	argFmt, err := cmdArgFormat()
+	if err != nil {
+		quitError("cmd arg fmt", err)
+	}
+
+	fileFmt, path, err := fileFormatAndPath(args)
+	if err != nil {
+		quitError("path arg", err)
+	}
+
+	format, err := combinedFormat(argFmt, fileFmt)
+	if err != nil {
+		quitError("file format", err)
+	}
+	return path, format
 }
 
 func combinedFormat(argFmt, fileFmt FileFormat) (FileFormat, error) {
@@ -148,6 +153,7 @@ func combinedFormat(argFmt, fileFmt FileFormat) (FileFormat, error) {
 	return UnknownFormat, fmt.Errorf("could not determine output format")
 }
 
+// cmdArgFormat specifies the file format set by the command line option
 func cmdArgFormat() (FileFormat, error) {
 	if jsonArg {
 		if yamlArg {
@@ -160,7 +166,7 @@ func cmdArgFormat() (FileFormat, error) {
 	return UnknownFormat, nil
 }
 
-func determineFileFormat(path string) FileFormat {
+func filenameFormat(path string) FileFormat {
 	switch strings.ToLower(filepath.Ext(path)) {
 	case ".json":
 		return JSONFormat
