@@ -61,6 +61,12 @@ var (
 		Args:    cobra.MinimumNArgs(1),
 		Run:     noteRemove,
 	}
+	getCmd = &cobra.Command{
+		Use:   "get id [id...]",
+		Short: "Get specific note(s)",
+		Args:  cobra.MinimumNArgs(1),
+		Run:   noteGet,
+	}
 	editCmd = &cobra.Command{
 		Use:   "edit id",
 		Short: "Edit content of note",
@@ -104,13 +110,13 @@ var (
 	pinnedArg bool
 
 	// List arguments
-	allArg        bool // also used in spaces sub-cmd
+	allArg        bool // also used in spaces
 	sortByArg     string
 	descendingArg bool
 	limitArg      int
 	offsetArg     int
-	styleArg      string
-	colorArg      string
+	styleArg      string // also used in get
+	colorArg      string // also used in get
 
 	// Spaces arguments
 	listArg bool
@@ -161,10 +167,16 @@ func init() {
 	collectFlagSet.IntVarP(&offsetArg, "offset", "o", 0, "begin list notes at some offset (only if limit > 0)")
 	collectFlagSet.BoolVarP(&descendingArg, "descending", "d", false, "descending order")
 
+	printFlagSet := pflag.NewFlagSet("print", pflag.ExitOnError)
+	printFlagSet.StringVar(&styleArg, "style", string(TitleStyle), "output style (plain, title)")
+	printFlagSet.StringVar(&colorArg, "color", "auto", "color option (auto, no|never, yes|always)")
+
 	listFlags := listCmd.Flags()
 	listFlags.AddFlagSet(collectFlagSet)
-	listFlags.StringVar(&styleArg, "style", string(TitleStyle), "output style (plain, title)")
-	listFlags.StringVar(&colorArg, "color", "auto", "color option (auto, no|never, yes|always)")
+	listFlags.AddFlagSet(printFlagSet)
+
+	getFlags := getCmd.Flags()
+	getFlags.AddFlagSet(printFlagSet)
 
 	spacesFlags := spacesCmd.Flags()
 	spacesFlags.BoolVarP(&allArg, "all", "a", false, "show hidden spaces")
@@ -188,8 +200,8 @@ func init() {
 	rootCmd.AddCommand(
 		initCmd,
 		addCmd, removeCmd,
+		getCmd, listCmd, spacesCmd,
 		editCmd, moveCmd,
-		listCmd, spacesCmd,
 		exportCmd,
 	)
 }
