@@ -77,6 +77,12 @@ var (
 		Args:  cobra.MinimumNArgs(1),
 		Run:   notePin,
 	}
+	unpinCmd = &cobra.Command{
+		Use:   "unpin id [id...]",
+		Short: "Unpin note(s) from top",
+		Args:  cobra.MinimumNArgs(1),
+		Run:   noteUnpin,
+	}
 	moveCmd = &cobra.Command{
 		Use:     "move id toSpace",
 		Aliases: []string{"mv"},
@@ -206,7 +212,7 @@ func init() {
 		initCmd,
 		addCmd, removeCmd,
 		getCmd, listCmd, spacesCmd,
-		editCmd, pinCmd, moveCmd,
+		editCmd, pinCmd, unpinCmd, moveCmd,
 		exportCmd,
 	)
 }

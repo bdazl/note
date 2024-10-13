@@ -31,13 +31,18 @@ func (d *DB) MoveNote(id int, toSpace string) error {
 	return d.updateRow("UPDATE notes SET space = ? WHERE id = ?", toSpace, id)
 }
 
-func (d *DB) PinNotes(ids []int) error {
+func (d *DB) PinNotes(ids []int, pinned bool) error {
 	count := len(ids)
 	if count < 1 {
 		return fmt.Errorf("must provide ids")
 	}
 
-	query := fmt.Sprintf("UPDATE notes SET is_pinned = 1 WHERE %v", equalOrChain("id", count))
+	pinVal := "0"
+	if pinned {
+		pinVal = "1"
+	}
+
+	query := fmt.Sprintf("UPDATE notes SET is_pinned = %v WHERE %v", pinVal, equalOrChain("id", count))
 	result, err := d.db.Exec(query, sliceToAny(ids)...)
 	if err != nil {
 		return fmt.Errorf("exec: %w", err)

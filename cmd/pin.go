@@ -28,6 +28,14 @@ import (
 )
 
 func notePin(cmd *cobra.Command, args []string) {
+	pin(args, true)
+}
+
+func noteUnpin(cmd *cobra.Command, args []string) {
+	pin(args, false)
+}
+
+func pin(args []string, pinned bool) {
 	ids, err := parseIds(args)
 	if err != nil {
 		quitError("parse ids", err)
@@ -37,14 +45,19 @@ func notePin(cmd *cobra.Command, args []string) {
 	defer db.Close()
 
 	uniqueIds := removeDuplicates(ids)
-	if err = db.PinNotes(uniqueIds); err != nil {
+	if err = db.PinNotes(uniqueIds, pinned); err != nil {
 		quitError("db pin", err)
+	}
+
+	pinStr := "unpinned"
+	if pinned {
+		pinStr = "pinned"
 	}
 
 	count := len(uniqueIds)
 	if count == 1 {
-		fmt.Println("Note pinned")
+		fmt.Printf("Note %v\n", pinStr)
 	} else {
-		fmt.Printf("%v notes pinned", count)
+		fmt.Printf("%v notes %v\n", count, pinStr)
 	}
 }
