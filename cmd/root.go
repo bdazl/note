@@ -165,10 +165,10 @@ func init() {
 	sortKeys := getSortKeys()
 	sortUsage := fmt.Sprintf("column to sort notes by (%v)", sortKeys)
 	collectFlagSet := pflag.NewFlagSet("collect", pflag.ExitOnError)
-	collectFlagSet.BoolVarP(&allArg, "all", "a", false, "show notes from all spaces")
-	_ = collectFlagSet.StringSliceP("spaces", "s", []string{DefaultSpace}, "only show notes from space(s)")
+	collectFlagSet.BoolVarP(&allArg, "all", "a", false, "list notes from all spaces")
+	_ = collectFlagSet.StringSliceP("spaces", "s", []string{DefaultSpace}, "only list notes from space(s)")
 	collectFlagSet.StringVarP(&sortByArg, "sort", "S", "id", sortUsage)
-	collectFlagSet.IntVarP(&limitArg, "limit", "l", 0, "limit amount of notes shown, 0 means no limit")
+	collectFlagSet.IntVarP(&limitArg, "limit", "l", 0, "limit amount of notes listed, 0 means no limit")
 	collectFlagSet.IntVarP(&offsetArg, "offset", "o", 0, "begin list notes at some offset (only if limit > 0)")
 	collectFlagSet.BoolVarP(&descendingArg, "descending", "d", false, "descending order")
 
