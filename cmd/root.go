@@ -97,9 +97,10 @@ var (
 		Run:     noteSpaces,
 	}
 	exportCmd = &cobra.Command{
-		Use:   "export",
-		Short: "Export notes to JSON or YAML file",
-		Run:   noteExport,
+		Use:     "export",
+		Aliases: []string{"exp"},
+		Short:   "Export notes to JSON or YAML file",
+		Run:     noteExport,
 	}
 
 	// Global arguments
