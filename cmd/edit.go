@@ -69,24 +69,6 @@ func noteEdit(cmd *cobra.Command, args []string) {
 	fmt.Println("Note modified")
 }
 
-func noteMove(cmd *cobra.Command, args []string) {
-	id, toSpace, err := checkMove(args)
-	if err != nil {
-		quitError("args", err)
-	}
-
-	d, err := db.Open(dbFilename())
-	if err != nil {
-		quitError("db open", err)
-	}
-
-	if err = d.MoveNote(id, toSpace); err != nil {
-		quitError("db move", err)
-	}
-
-	fmt.Println("Note modified")
-}
-
 func openInEditor(initText string) (string, error) {
 	// Create a temporary file
 	tmpFile, err := os.CreateTemp("", "note.*.txt")
@@ -140,15 +122,4 @@ func checkEdit(args []string) (int, error) {
 		return 0, fmt.Errorf("requires positional argument id")
 	}
 	return strconv.Atoi(args[0])
-}
-
-func checkMove(args []string) (int, string, error) {
-	if len(args) != 2 {
-		return 0, "", fmt.Errorf("requires positional arguments id and toSpace")
-	}
-	id, err := strconv.Atoi(args[0])
-	if err != nil {
-		return 0, "", fmt.Errorf("id parse error: %w", err)
-	}
-	return id, args[1], nil
 }
