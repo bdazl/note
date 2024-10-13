@@ -23,37 +23,28 @@ package cmd
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/spf13/cobra"
 )
 
 func noteRemove(cmd *cobra.Command, args []string) {
-	ids, err := checkRemoveArguments(args)
+	ids, err := parseIds(args)
 	if err != nil {
-		quitError("args", err)
+		quitError("parse ids", err)
 	}
 
-	d := dbOpen()
-	defer d.Close()
+	db := dbOpen()
+	defer db.Close()
 
-	if err := d.RemoveNotes(ids); err != nil {
+	uniqueIds := removeDuplicates(ids)
+	if err := db.RemoveNotes(uniqueIds); err != nil {
 		quitError("db remove", err)
 	}
-}
 
-func checkRemoveArguments(args []string) ([]int, error) {
-	if len(args) < 1 {
-		return nil, fmt.Errorf("you must provide at least one id")
+	count := len(uniqueIds)
+	if count == 1 {
+		fmt.Println("Note removed")
+	} else {
+		fmt.Println("%v notes removed", count)
 	}
-
-	out := make([]int, len(args))
-	for i, ids := range args {
-		id, err := strconv.Atoi(ids)
-		if err != nil {
-			return nil, err
-		}
-		out[i] = id
-	}
-	return out, nil
 }

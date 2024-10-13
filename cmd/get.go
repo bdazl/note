@@ -29,9 +29,9 @@ import (
 )
 
 func noteGet(cmd *cobra.Command, args []string) {
-	ids, err := checkGetArgs(args)
+	ids, err := parseIds(args)
 	if err != nil {
-		quitError("args", err)
+		quitError("parse ids", err)
 	}
 
 	style, color, err := styleColorOpts()
@@ -51,7 +51,7 @@ func noteGet(cmd *cobra.Command, args []string) {
 	pprintNotes(notes, style, color)
 }
 
-func checkGetArgs(args []string) ([]int, error) {
+func parseIds(args []string) ([]int, error) {
 	if len(args) < 1 {
 		return nil, fmt.Errorf("require at least one id")
 	}

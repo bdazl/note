@@ -45,7 +45,7 @@ func (d *DB) RemoveNotes(ids []int) error {
 	}
 
 	if rows != int64(count) {
-		return fmt.Errorf("nothing was deleted")
+		return fmt.Errorf("only %v out of %v was deleted successfully", rows, count)
 	}
 
 	return nil
