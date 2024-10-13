@@ -91,7 +91,7 @@ func (p *PageOpts) Check() error {
 func (d *DB) ListNotes(spaces []string, sortOpts *SortOpts, pageOpts *PageOpts) ([]Note, error) {
 	var (
 		addParams     = []any{}
-		sortQueryAdd  = "ORDER BY is_pinned DESC" // By default we always sort pinned first
+		sortQueryAdd  = "ORDER BY pinned DESC" // By default we always sort pinned first
 		pageQueryAdd  = ""
 		spaceQueryAdd = ""
 		limit         = 0
@@ -103,7 +103,7 @@ func (d *DB) ListNotes(spaces []string, sortOpts *SortOpts, pageOpts *PageOpts) 
 		}
 		order := sortOpts.orderStr()
 		sortColumn := string(sortOpts.SortColumn)
-		sortQueryAdd = fmt.Sprintf("ORDER BY is_pinned DESC, %v %v", sortColumn, order)
+		sortQueryAdd = fmt.Sprintf("ORDER BY pinned DESC, %v %v", sortColumn, order)
 	}
 	if pageOpts != nil {
 		if err := pageOpts.Check(); err != nil {

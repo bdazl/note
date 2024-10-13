@@ -42,7 +42,7 @@ func (d *DB) PinNotes(ids []int, pinned bool) error {
 		pinVal = "1"
 	}
 
-	query := fmt.Sprintf("UPDATE notes SET is_pinned = %v WHERE %v", pinVal, equalOrChain("id", count))
+	query := fmt.Sprintf("UPDATE notes SET pinned = %v WHERE %v", pinVal, equalOrChain("id", count))
 	result, err := d.db.Exec(query, sliceToAny(ids)...)
 	if err != nil {
 		return fmt.Errorf("exec: %w", err)

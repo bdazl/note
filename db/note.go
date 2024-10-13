@@ -30,10 +30,10 @@ import (
 const (
 	IDColumn         Column = "id"
 	SpaceColumn      Column = "space"
-	CreatedColumn    Column = "created_at"
-	LastUpdateColumn Column = "updated_at"
+	CreatedColumn    Column = "created"
+	LastUpdateColumn Column = "last_updated"
 	ContentColumn    Column = "content"
-	PinnedColumn     Column = "is_pinned"
+	PinnedColumn     Column = "pinned"
 )
 
 var (
@@ -65,7 +65,7 @@ type dbNote struct {
 // Helpers
 
 func allNoteColumnsGen() string {
-	// id, space, created_at, updated_at, content, is_pinned
+	// id, space, created, last_updated, content, pinned
 	cols := []string{
 		string(IDColumn),
 		string(SpaceColumn),

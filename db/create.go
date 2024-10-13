@@ -31,16 +31,16 @@ const (
 	createTableSql = `CREATE TABLE IF NOT EXISTS notes (
 		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 		space TEXT NOT NULL,
-		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		created DATETIME DEFAULT CURRENT_TIMESTAMP,
+		last_updated DATETIME DEFAULT CURRENT_TIMESTAMP,
 		content TEXT NOT NULL,
-		is_pinned BOOLEAN DEFAULT 0);`
+		pinned BOOLEAN DEFAULT 0);`
 
-	createTriggerSql = `CREATE TRIGGER IF NOT EXISTS notes_auto_updated_at
+	createTriggerSql = `CREATE TRIGGER IF NOT EXISTS notes_auto_last_updated
 		AFTER UPDATE ON notes
 		FOR EACH ROW
 		BEGIN
-			UPDATE notes SET updated_at = CURRENT_TIMESTAMP WHERE id = OLD.id;
+			UPDATE notes SET last_updated = CURRENT_TIMESTAMP WHERE id = OLD.id;
 		END;`
 )
 

@@ -30,8 +30,8 @@ import (
 // otherwise timestamps and other default values are set automatically.
 func (d *DB) AddNote(note Note, full bool) (int64, error) {
 	const (
-		smallQuery = "INSERT INTO notes (space, content, is_pinned) VALUES (?, ?, ?);"
-		fullQuery  = `INSERT INTO notes (space, created_at, updated_at, content, is_pinned)
+		smallQuery = "INSERT INTO notes (space, content, pinned) VALUES (?, ?, ?);"
+		fullQuery  = `INSERT INTO notes (space, created, last_updated, content, pinned)
 		VALUES (?, ?, ?, ?, ?);`
 	)
 	var (
