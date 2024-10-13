@@ -46,12 +46,12 @@ const (
 type FileFormat int
 
 type FileNote struct {
-	ID        int       `json:"id" yaml:"id"`
-	Pinned    bool      `json:"pinned" yaml:"pinned"`
-	Space     string    `json:"space" yaml:"space"`
-	Content   string    `json:"content" yaml:"content"`
-	CreatedAt time.Time `json:"created_at" yaml:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" yaml:"updated_at"`
+	ID          int       `json:"id" yaml:"id"`
+	Pinned      bool      `json:"pinned" yaml:"pinned"`
+	Space       string    `json:"space" yaml:"space"`
+	Content     string    `json:"content" yaml:"content"`
+	Created     time.Time `json:"created" yaml:"created"`
+	LastUpdated time.Time `json:"last_updated" yaml:"last_updated"`
 }
 
 func noteExport(cmd *cobra.Command, args []string) {
@@ -102,12 +102,12 @@ func convFileNotes(notes []db.Note) []FileNote {
 	converted := make([]FileNote, len(notes))
 	for i, note := range notes {
 		converted[i] = FileNote{
-			ID:        note.ID,
-			Pinned:    note.Pinned,
-			Space:     note.Space,
-			Content:   note.Content,
-			CreatedAt: note.Created,
-			UpdatedAt: note.LastUpdate,
+			ID:          note.ID,
+			Pinned:      note.Pinned,
+			Space:       note.Space,
+			Content:     note.Content,
+			Created:     note.Created,
+			LastUpdated: note.LastUpdate,
 		}
 	}
 	return converted
