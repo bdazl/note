@@ -26,9 +26,22 @@ import (
 	"strings"
 
 	"github.com/bdazl/note/db"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/exp/maps"
+)
+
+type Color string
+type Style string
+
+const (
+	PlainStyle Style = "plain"
+	TitleStyle Style = "title"
+
+	AutoColor   Color = "auto"
+	NeverColor  Color = "never"
+	AlwaysColor Color = "always"
 )
 
 var (
@@ -42,12 +55,17 @@ var (
 )
 
 func noteList(cmd *cobra.Command, args []string) {
+	style, color, err := styleColorOpts()
+	if err != nil {
+		quitError("args", err)
+	}
+
 	notes, err := collectNotes()
 	if err != nil {
 		quitError("collect notes", err)
 	}
 
-	pprintNotes(notes)
+	pprintNotes(notes, style, color)
 }
 
 func noteSpaces(cmd *cobra.Command, args []string) {
@@ -63,6 +81,32 @@ func noteSpaces(cmd *cobra.Command, args []string) {
 
 	spacesStr := strings.Join(spaces, " ")
 	fmt.Println(spacesStr)
+}
+
+func styleColorOpts() (Style, bool, error) {
+	var (
+		style   Style
+		doColor bool
+	)
+	switch styleArg {
+	case string(PlainStyle):
+		style = PlainStyle
+	case string(TitleStyle):
+		style = TitleStyle
+	default:
+		return "", false, fmt.Errorf("unrecognized style")
+	}
+
+	switch colorArg {
+	case "auto":
+		doColor = !color.NoColor
+	case "yes", "always":
+		doColor = true
+	case "no", "never":
+		doColor = false
+	}
+
+	return style, doColor, nil
 }
 
 func collectNotes() ([]db.Note, error) {
@@ -110,9 +154,52 @@ func listOpts() (*db.SortOpts, *db.PageOpts, error) {
 	return sortOpts, pageOpts, nil
 }
 
-func pprintNotes(notes []db.Note) {
+func pprintNotes(notes []db.Note, style Style, doColor bool) {
+	switch style {
+	case PlainStyle:
+		printNotesPlain(notes)
+	case TitleStyle:
+		printNotesTitle(notes, doColor)
+	}
+}
+
+func printNotesPlain(notes []db.Note) {
 	for _, n := range notes {
-		fmt.Println(n.Content)
+		fmt.Printf(n.Content)
+	}
+}
+
+func printNotesTitle(notes []db.Note, doColor bool) {
+	var (
+		col = color.New(color.FgGreen)
+
+		boxThin = '\u2500'
+		line    = strings.Repeat(string(boxThin), 4)
+	)
+
+	// fatih/color is (too) smart and disables colors for non-terminal outputs
+	// doColor considers such cases when color is set to 'auto'. If doColor is
+	// true - we should explicitly enable the color
+	if doColor {
+		color.NoColor = false
+	}
+
+	for _, n := range notes {
+		if doColor {
+			col.Printf("%s [", line)
+			fmt.Printf("%v", n.ID)
+			col.Printf("] %s\n", line)
+		} else {
+			fmt.Printf("%s [%v] %s\n", line, n.ID, line)
+		}
+
+		// TODO: Why is a newline added?
+		content := strings.TrimRight(n.Content, "\n")
+		fmt.Println(content)
+	}
+
+	if doColor {
+		color.NoColor = true
 	}
 }
 

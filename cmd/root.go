@@ -108,6 +108,8 @@ var (
 	descendingArg bool
 	limitArg      int
 	offsetArg     int
+	styleArg      string
+	colorArg      string
 
 	// Export arguments
 	jsonArg       bool
@@ -157,6 +159,8 @@ func init() {
 
 	listFlags := listCmd.Flags()
 	listFlags.AddFlagSet(collectFlagSet)
+	listFlags.StringVar(&styleArg, "style", string(TitleStyle), "output style (plain, title)")
+	listFlags.StringVar(&colorArg, "color", "auto", "color option (auto, no|never, yes|always)")
 
 	exportFlags := exportCmd.Flags()
 	exportFlags.AddFlagSet(collectFlagSet)
