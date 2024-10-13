@@ -45,6 +45,6 @@ func noteRemove(cmd *cobra.Command, args []string) {
 	if count == 1 {
 		fmt.Println("Note removed")
 	} else {
-		fmt.Println("%v notes removed", count)
+		fmt.Printf("%v notes removed", count)
 	}
 }
