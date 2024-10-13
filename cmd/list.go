@@ -100,10 +100,8 @@ func collectNotes() ([]db.Note, error) {
 		return nil, fmt.Errorf("args: %w", err)
 	}
 
-	d, err := db.Open(dbFilename())
-	if err != nil {
-		return nil, fmt.Errorf("db open: %w", err)
-	}
+	d := dbOpen()
+	defer d.Close()
 
 	spaces, err := getSpaces(d)
 	if err != nil {

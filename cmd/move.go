@@ -25,7 +25,6 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/bdazl/note/db"
 	"github.com/spf13/cobra"
 )
 
@@ -35,12 +34,10 @@ func noteMove(cmd *cobra.Command, args []string) {
 		quitError("args", err)
 	}
 
-	d, err := db.Open(dbFilename())
-	if err != nil {
-		quitError("db open", err)
-	}
+	db := dbOpen()
+	defer db.Close()
 
-	if err = d.MoveNote(id, toSpace); err != nil {
+	if err = db.MoveNote(id, toSpace); err != nil {
 		quitError("db move", err)
 	}
 

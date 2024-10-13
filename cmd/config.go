@@ -26,6 +26,7 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/bdazl/note/db"
 	"github.com/spf13/viper"
 )
 
@@ -90,4 +91,12 @@ func defaultEditor() string {
 
 func dbFilename() string {
 	return viper.GetString("db")
+}
+
+func dbOpen() *db.DB {
+	d, err := db.Open(dbFilename())
+	if err != nil {
+		quitError("db open", err)
+	}
+	return d
 }

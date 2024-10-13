@@ -25,7 +25,6 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/bdazl/note/db"
 	"github.com/spf13/cobra"
 )
 
@@ -40,13 +39,11 @@ func noteGet(cmd *cobra.Command, args []string) {
 		quitError("args", err)
 	}
 
-	d, err := db.Open(dbFilename())
-	if err != nil {
-		quitError("db open", err)
-	}
+	db := dbOpen()
+	defer db.Close()
 
 	uniqueIds := removeDuplicates(ids)
-	notes, err := d.GetNotes(uniqueIds)
+	notes, err := db.GetNotes(uniqueIds)
 	if err != nil {
 		quitError("db get", err)
 	}

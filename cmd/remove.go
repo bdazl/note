@@ -25,7 +25,6 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/bdazl/note/db"
 	"github.com/spf13/cobra"
 )
 
@@ -35,10 +34,8 @@ func noteRemove(cmd *cobra.Command, args []string) {
 		quitError("args", err)
 	}
 
-	d, err := db.Open(dbFilename())
-	if err != nil {
-		quitError("db open", err)
-	}
+	d := dbOpen()
+	defer d.Close()
 
 	if err := d.RemoveNotes(ids); err != nil {
 		quitError("db remove", err)

@@ -40,16 +40,14 @@ func noteAdd(cmd *cobra.Command, args []string) {
 		quitError("arg", err)
 	}
 
-	d, err := db.Open(dbFilename())
-	if err != nil {
-		quitError("db open", err)
-	}
-
 	add := db.Note{
 		Space:   viper.GetString(ViperAddSpace),
 		Content: content,
 		Pinned:  pinnedArg,
 	}
+
+	d := dbOpen()
+	defer d.Close()
 
 	id, err := d.AddNote(add, false)
 	if err != nil {

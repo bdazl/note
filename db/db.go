@@ -31,6 +31,10 @@ type DB struct {
 	db *sql.DB
 }
 
+func (d *DB) Close() error {
+	return d.db.Close()
+}
+
 func Open(path string) (*DB, error) {
 	s, err := os.Stat(path)
 	if os.IsNotExist(err) {

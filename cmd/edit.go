@@ -27,7 +27,6 @@ import (
 	"os/exec"
 	"strconv"
 
-	"github.com/bdazl/note/db"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -38,12 +37,10 @@ func noteEdit(cmd *cobra.Command, args []string) {
 		quitError("args", err)
 	}
 
-	d, err := db.Open(dbFilename())
-	if err != nil {
-		quitError("db open", err)
-	}
+	db := dbOpen()
+	defer db.Close()
 
-	note, err := d.GetNote(id)
+	note, err := db.GetNote(id)
 	if err != nil {
 		quitError("db move", err)
 	}
@@ -62,7 +59,7 @@ func noteEdit(cmd *cobra.Command, args []string) {
 		os.Exit(2)
 	}
 
-	if err = d.ReplaceContent(note.ID, edited); err != err {
+	if err = db.ReplaceContent(note.ID, edited); err != err {
 		quitError("db replace", err)
 	}
 

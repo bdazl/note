@@ -32,10 +32,8 @@ import (
 func noteSpaces(cmd *cobra.Command, args []string) {
 	sortOpts, err := spacesSortOpt()
 
-	d, err := db.Open(dbFilename())
-	if err != nil {
-		quitError("db open", err)
-	}
+	d := dbOpen()
+	defer d.Close()
 
 	spaces, err := d.ListSpaces(sortOpts)
 	if err != nil {
