@@ -45,12 +45,12 @@ const (
 )
 
 var (
-	validSortColumns = map[string]db.NoteColumn{
-		"id":      db.ColumnID,
-		"space":   db.ColumnSpace,
-		"content": db.ColumnContent,
-		"created": db.ColumnCreatedAt,
-		"updated": db.ColumnCreatedAt,
+	validNoteSortColumns = map[string]db.Column{
+		"id":      db.IDColumn,
+		"space":   db.SpaceColumn,
+		"content": db.ContentColumn,
+		"created": db.CreatedColumn,
+		"updated": db.CreatedColumn,
 	}
 )
 
@@ -66,21 +66,6 @@ func noteList(cmd *cobra.Command, args []string) {
 	}
 
 	pprintNotes(notes, style, color)
-}
-
-func noteSpaces(cmd *cobra.Command, args []string) {
-	d, err := db.Open(dbFilename())
-	if err != nil {
-		quitError("db open", err)
-	}
-
-	spaces, err := d.ListSpaces()
-	if err != nil {
-		quitError("db list", err)
-	}
-
-	spacesStr := strings.Join(spaces, " ")
-	fmt.Println(spacesStr)
 }
 
 func styleColorOpts() (Style, bool, error) {
@@ -133,7 +118,7 @@ func collectNotes() ([]db.Note, error) {
 }
 
 func listOpts() (*db.SortOpts, *db.PageOpts, error) {
-	sortColumn, err := mapSortColumn(sortByArg)
+	sortColumn, err := mapNoteSortColumn(sortByArg)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -205,7 +190,7 @@ func printNotesTitle(notes []db.Note, doColor bool) {
 
 func getSpaces(d *db.DB) ([]string, error) {
 	if allArg {
-		spaces, err := d.ListSpaces()
+		spaces, err := d.ListSpaces(nil)
 		if err != nil {
 			return nil, err
 		}
@@ -214,8 +199,8 @@ func getSpaces(d *db.DB) ([]string, error) {
 	return viper.GetStringSlice(ViperListSpaces), nil
 }
 
-func mapSortColumn(s string) (db.NoteColumn, error) {
-	out, ok := validSortColumns[s]
+func mapNoteSortColumn(s string) (db.Column, error) {
+	out, ok := validNoteSortColumns[s]
 	if !ok {
 		return "", fmt.Errorf("invalid sort option: %v", s)
 	}
@@ -223,6 +208,6 @@ func mapSortColumn(s string) (db.NoteColumn, error) {
 }
 
 func getSortKeys() string {
-	sortKeys := maps.Keys(validSortColumns)
+	sortKeys := maps.Keys(validNoteSortColumns)
 	return strings.Join(sortKeys, ", ")
 }

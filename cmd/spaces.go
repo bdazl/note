@@ -19,50 +19,50 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package db
+package cmd
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/bdazl/note/db"
+	"github.com/spf13/cobra"
 )
 
-// Add a note to the database.
-// If full is true, then all values (except ID) are taken from the input,
-// otherwise timestamps and other default values are set automatically.
-func (d *DB) AddNote(note Note, full bool) (int64, error) {
-	const (
-		smallQuery = "INSERT INTO notes (space, content, is_pinned) VALUES (?, ?, ?);"
-		fullQuery  = `INSERT INTO notes (space, created_at, updated_at, content, is_pinned)
-		VALUES (?, ?, ?, ?, ?);`
-	)
-	var (
-		dbN    = toDbNote(note)
-		query  string
-		params []any
-	)
+func noteSpaces(cmd *cobra.Command, args []string) {
+	sortOpts, err := spacesSortOpt()
 
-	if full {
-		query = fullQuery
-		params = []any{
-			dbN.Space,
-			dbN.Created,
-			dbN.LastUpdate,
-			dbN.Content,
-			dbN.Pinned,
+	d, err := db.Open(dbFilename())
+	if err != nil {
+		quitError("db open", err)
+	}
+
+	spaces, err := d.ListSpaces(sortOpts)
+	if err != nil {
+		quitError("db list", err)
+	}
+
+	if listArg {
+		for _, space := range spaces {
+			fmt.Println(space)
 		}
 	} else {
-		query = smallQuery
-		params = []any{dbN.Space, dbN.Content, dbN.Pinned}
+		spacesStr := strings.Join(spaces, " ")
+		fmt.Println(spacesStr)
+	}
+}
+
+func spacesSortOpt() (*db.SortOpts, error) {
+	sortOpts := &db.SortOpts{
+		Ascending:  !descendingArg,
+		SortColumn: db.SpaceColumn,
 	}
 
-	result, err := d.db.Exec(query, params...)
-	if err != nil {
-		return 0, fmt.Errorf("insert error: %w", err)
+	// This should never error, because the column is hard-coded.
+	// Let's be mindful of any future slip-ups :)
+	if err := sortOpts.Check(); err != nil {
+		return nil, err
 	}
 
-	id, err := result.LastInsertId()
-	if err != nil {
-		return id, fmt.Errorf("last insert id error: %w", err)
-	}
-
-	return id, nil
+	return sortOpts, nil
 }

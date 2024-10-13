@@ -28,12 +28,12 @@ import (
 )
 
 const (
-	ColumnID        NoteColumn = "id"
-	ColumnSpace     NoteColumn = "space"
-	ColumnCreatedAt NoteColumn = "created_at"
-	ColumnUpdatedAt NoteColumn = "updated_at"
-	ColumnContent   NoteColumn = "content"
-	ColumnIsPinned  NoteColumn = "is_pinned"
+	IDColumn         Column = "id"
+	SpaceColumn      Column = "space"
+	CreatedColumn    Column = "created_at"
+	LastUpdateColumn Column = "updated_at"
+	ContentColumn    Column = "content"
+	PinnedColumn     Column = "is_pinned"
 )
 
 var (
@@ -42,24 +42,24 @@ var (
 
 // Exported definition of a Note, in the DB
 type Note struct {
-	ID        int
-	Space     string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Content   string
-	IsPinned  bool
+	ID         int
+	Space      string
+	Created    time.Time
+	LastUpdate time.Time
+	Content    string
+	Pinned     bool
 }
 
-type NoteColumn string
+type Column string
 
 // Internal representation of a note
 type dbNote struct {
-	ID        int
-	Space     string
-	CreatedAt string
-	UpdatedAt string
-	Content   string
-	IsPinned  bool
+	ID         int
+	Space      string
+	Created    string
+	LastUpdate string
+	Content    string
+	Pinned     bool
 }
 
 // Helpers
@@ -67,46 +67,46 @@ type dbNote struct {
 func allNoteColumnsGen() string {
 	// id, space, created_at, updated_at, content, is_pinned
 	cols := []string{
-		string(ColumnID),
-		string(ColumnSpace),
-		string(ColumnCreatedAt),
-		string(ColumnUpdatedAt),
-		string(ColumnContent),
-		string(ColumnIsPinned),
+		string(IDColumn),
+		string(SpaceColumn),
+		string(CreatedColumn),
+		string(LastUpdateColumn),
+		string(ContentColumn),
+		string(PinnedColumn),
 	}
 
 	return strings.Join(cols, ", ")
 }
 
 func toNote(note dbNote) (*Note, error) {
-	createdAt, err := parseTime(note.CreatedAt)
+	createdAt, err := parseTime(note.Created)
 	if err != nil {
 		return nil, err
 	}
 
-	updatedAt, err := parseTime(note.UpdatedAt)
+	updatedAt, err := parseTime(note.LastUpdate)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Note{
-		ID:        note.ID,
-		Space:     note.Space,
-		CreatedAt: createdAt,
-		UpdatedAt: updatedAt,
-		Content:   note.Content,
-		IsPinned:  note.IsPinned,
+		ID:         note.ID,
+		Space:      note.Space,
+		Created:    createdAt,
+		LastUpdate: updatedAt,
+		Content:    note.Content,
+		Pinned:     note.Pinned,
 	}, nil
 }
 
 func toDbNote(note Note) dbNote {
 	return dbNote{
-		ID:        note.ID,
-		Space:     note.Space,
-		CreatedAt: note.CreatedAt.Format("2006-01-02 15:04:05"),
-		UpdatedAt: note.UpdatedAt.Format("2006-01-02 15:04:05"),
-		Content:   note.Content,
-		IsPinned:  note.IsPinned,
+		ID:         note.ID,
+		Space:      note.Space,
+		Created:    note.Created.Format("2006-01-02 15:04:05"),
+		LastUpdate: note.LastUpdate.Format("2006-01-02 15:04:05"),
+		Content:    note.Content,
+		Pinned:     note.Pinned,
 	}
 }
 

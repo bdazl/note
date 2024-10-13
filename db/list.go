@@ -31,25 +31,25 @@ const (
 )
 
 var (
-	validSortColumns = map[NoteColumn]bool{
-		ColumnID:        true,
-		ColumnSpace:     true,
-		ColumnCreatedAt: true,
-		ColumnUpdatedAt: true,
-		ColumnContent:   true,
-		ColumnIsPinned:  true,
+	validSortColumns = map[Column]bool{
+		IDColumn:         true,
+		SpaceColumn:      true,
+		CreatedColumn:    true,
+		LastUpdateColumn: true,
+		ContentColumn:    true,
+		PinnedColumn:     true,
 	}
 )
 
 type SortOpts struct {
 	Ascending  bool
-	SortColumn NoteColumn
+	SortColumn Column
 }
 
 func DefaultSortOpts() SortOpts {
 	return SortOpts{
 		Ascending:  true,
-		SortColumn: ColumnID,
+		SortColumn: IDColumn,
 	}
 }
 
@@ -149,8 +149,14 @@ func (d *DB) ListNotes(spaces []string, sortOpts *SortOpts, pageOpts *PageOpts) 
 	return notes, nil
 }
 
-func (d *DB) ListSpaces() ([]string, error) {
-	rows, err := d.db.Query("SELECT DISTINCT space FROM notes")
+func (d *DB) ListSpaces(sortOpts *SortOpts) ([]string, error) {
+	orderBy := ""
+	if sortOpts != nil {
+		orderBy = fmt.Sprintf("ORDER BY %v %v", sortOpts.SortColumn, sortOpts.orderStr())
+	}
+
+	query := fmt.Sprintf("SELECT DISTINCT space FROM notes %v", orderBy)
+	rows, err := d.db.Query(query)
 	if err != nil {
 		return nil, fmt.Errorf("query error: %w", err)
 	}

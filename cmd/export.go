@@ -103,11 +103,11 @@ func convFileNotes(notes []db.Note) []FileNote {
 	for i, note := range notes {
 		converted[i] = FileNote{
 			ID:        note.ID,
-			Pinned:    note.IsPinned,
+			Pinned:    note.Pinned,
 			Space:     note.Space,
 			Content:   note.Content,
-			CreatedAt: note.CreatedAt,
-			UpdatedAt: note.UpdatedAt,
+			CreatedAt: note.Created,
+			UpdatedAt: note.LastUpdate,
 		}
 	}
 	return converted

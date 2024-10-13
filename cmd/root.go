@@ -81,9 +81,10 @@ var (
 		Run:     noteList,
 	}
 	spacesCmd = &cobra.Command{
-		Use:   "spaces",
-		Short: "Prints all spaces that holds notes",
-		Run:   noteSpaces,
+		Use:     "spaces",
+		Aliases: []string{"spc"},
+		Short:   "Prints all spaces that holds notes",
+		Run:     noteSpaces,
 	}
 	exportCmd = &cobra.Command{
 		Use:   "export",
@@ -103,13 +104,16 @@ var (
 	pinnedArg bool
 
 	// List arguments
-	allArg        bool
+	allArg        bool // also used in spaces sub-cmd
 	sortByArg     string
 	descendingArg bool
 	limitArg      int
 	offsetArg     int
 	styleArg      string
 	colorArg      string
+
+	// Spaces arguments
+	listArg bool
 
 	// Export arguments
 	jsonArg       bool
@@ -155,12 +159,17 @@ func init() {
 	collectFlagSet.StringVarP(&sortByArg, "sort", "S", "id", sortUsage)
 	collectFlagSet.IntVarP(&limitArg, "limit", "l", 0, "limit amount of notes shown, 0 means no limit")
 	collectFlagSet.IntVarP(&offsetArg, "offset", "o", 0, "begin list notes at some offset (only if limit > 0)")
-	collectFlagSet.BoolVarP(&descendingArg, "descending", "r", false, "descending order")
+	collectFlagSet.BoolVarP(&descendingArg, "descending", "d", false, "descending order")
 
 	listFlags := listCmd.Flags()
 	listFlags.AddFlagSet(collectFlagSet)
 	listFlags.StringVar(&styleArg, "style", string(TitleStyle), "output style (plain, title)")
 	listFlags.StringVar(&colorArg, "color", "auto", "color option (auto, no|never, yes|always)")
+
+	spacesFlags := spacesCmd.Flags()
+	spacesFlags.BoolVarP(&allArg, "all", "a", false, "show hidden spaces")
+	spacesFlags.BoolVarP(&listArg, "list", "l", false, "separate each space with a newline")
+	spacesFlags.BoolVarP(&descendingArg, "descending", "d", false, "descending order")
 
 	exportFlags := exportCmd.Flags()
 	exportFlags.AddFlagSet(collectFlagSet)

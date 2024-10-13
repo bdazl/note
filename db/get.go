@@ -46,10 +46,10 @@ func scanNote(scanner Scanner) (*Note, error) {
 	err := scanner.Scan(
 		&dbN.ID,
 		&dbN.Space,
-		&dbN.CreatedAt,
-		&dbN.UpdatedAt,
+		&dbN.Created,
+		&dbN.LastUpdate,
 		&dbN.Content,
-		&dbN.IsPinned,
+		&dbN.Pinned,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("scan error: %w", err)
