@@ -65,6 +65,12 @@ var (
 		Args:  cobra.MinimumNArgs(1),
 		Run:   noteGet,
 	}
+	listCmd = &cobra.Command{
+		Use:     "list",
+		Aliases: []string{"ls"},
+		Short:   "Prints some or all of your notes",
+		Run:     noteList,
+	}
 	editCmd = &cobra.Command{
 		Use:   "edit id",
 		Short: "Edit content of note",
@@ -89,12 +95,6 @@ var (
 		Short:   "Move note to other space",
 		Args:    cobra.MinimumNArgs(2),
 		Run:     noteMove,
-	}
-	listCmd = &cobra.Command{
-		Use:     "list",
-		Aliases: []string{"ls"},
-		Short:   "Prints some or all of your notes",
-		Run:     noteList,
 	}
 	spacesCmd = &cobra.Command{
 		Use:     "spaces",
