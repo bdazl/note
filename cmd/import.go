@@ -124,13 +124,13 @@ func decodeJSON(reader io.Reader) ([]FileNote, error) {
 	decoder := json.NewDecoder(reader)
 	out := make([]FileNote, 0)
 	for {
-		var note FileNote
-		if err := decoder.Decode(&note); err == io.EOF {
+		var notes []FileNote
+		if err := decoder.Decode(&notes); err == io.EOF {
 			break
 		} else if err != nil {
 			return nil, err
 		}
-		out = append(out, note)
+		out = append(out, notes...)
 	}
 	return out, nil
 }
