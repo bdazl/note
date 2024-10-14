@@ -65,9 +65,9 @@ var (
 		Run:   noteGet,
 	}
 	listCmd = &cobra.Command{
-		Use:     "list",
+		Use:     "list [space...]",
 		Aliases: []string{"ls"},
-		Short:   "Prints some or all of your notes",
+		Short:   "Lists notes from one or more spaces",
 		Run:     noteList,
 	}
 	editCmd = &cobra.Command{
@@ -144,6 +144,7 @@ var (
 	listArg bool
 
 	// Import/Export arguments
+	spacesArg     []string
 	jsonArg       bool
 	yamlArg       bool
 	jsonIndentArg string
@@ -187,8 +188,6 @@ func init() {
 	sortKeys := getSortKeys()
 	sortUsage := fmt.Sprintf("column to sort notes by (%v)", sortKeys)
 	collectFlagSet := pflag.NewFlagSet("collect", pflag.ExitOnError)
-	collectFlagSet.BoolVarP(&allArg, "all", "a", false, "list notes from all spaces")
-	_ = collectFlagSet.StringSliceP("spaces", "s", []string{DefaultSpace}, "only list notes from space(s)")
 	collectFlagSet.StringVarP(&sortByArg, "sort", "S", "id", sortUsage)
 	collectFlagSet.IntVarP(&limitArg, "limit", "l", 0, "limit amount of notes listed, 0 means no limit")
 	collectFlagSet.IntVarP(&offsetArg, "offset", "o", 0, "begin list notes at some offset (only if limit > 0)")
@@ -223,6 +222,7 @@ func init() {
 	exportFlags := exportCmd.Flags()
 	exportFlags.AddFlagSet(collectFlagSet)
 	exportFlags.AddFlagSet(inoutFlagSet)
+	exportFlags.StringSliceVarP(&spacesArg, "spaces", "s", []string{}, "limit export to notes from space(s)")
 	exportFlags.BoolVar(&forceArg, "force", false, "determines if existing file will be overwritten")
 	exportFlags.StringVarP(&jsonIndentArg, "indent", "i", "", "JSON indentation encoding option")
 	exportFlags.StringVarP(&jsonPrefixArg, "prefix", "p", "", "JSON prefix encoding option")

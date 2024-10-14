@@ -31,10 +31,9 @@ import (
 )
 
 const (
-	ViperDb         = "db"
-	ViperEditor     = "editor"
-	ViperAddSpace   = "add_space"
-	ViperListSpaces = "ls_spaces"
+	ViperDb       = "db"
+	ViperEditor   = "editor"
+	ViperAddSpace = "default_space"
 
 	DefaultSpace = "main"
 )
@@ -61,7 +60,6 @@ func initConfig() {
 	viper.SetDefault(ViperDb, dfltStore)
 	viper.SetDefault(ViperEditor, defaultEditor())
 	viper.SetDefault(ViperAddSpace, DefaultSpace)
-	viper.SetDefault(ViperListSpaces, []string{DefaultSpace})
 
 	viper.AutomaticEnv()
 

@@ -66,7 +66,7 @@ func noteExport(cmd *cobra.Command, args []string) {
 		quitError("file format", err)
 	}
 
-	notes, err := collectNotes()
+	notes, err := collectNotes(spacesArg)
 	if err != nil {
 		quitError("collect notes", err)
 	}

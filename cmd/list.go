@@ -28,7 +28,6 @@ import (
 	"github.com/bdazl/note/db"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"golang.org/x/exp/maps"
 )
 
@@ -60,7 +59,7 @@ func noteList(cmd *cobra.Command, args []string) {
 		quitError("args", err)
 	}
 
-	notes, err := collectNotes()
+	notes, err := collectNotes(args)
 	if err != nil {
 		quitError("collect notes", err)
 	}
@@ -94,7 +93,7 @@ func styleColorOpts() (Style, bool, error) {
 	return style, doColor, nil
 }
 
-func collectNotes() (db.Notes, error) {
+func collectNotes(spaces []string) (db.Notes, error) {
 	sortOpts, pageOpts, err := listOpts()
 	if err != nil {
 		return nil, fmt.Errorf("args: %w", err)
@@ -103,12 +102,16 @@ func collectNotes() (db.Notes, error) {
 	d := dbOpen()
 	defer d.Close()
 
-	spaces, err := getSpaces(d)
-	if err != nil {
-		return nil, fmt.Errorf("ls spaces: %w", err)
+	lsSpaces := spaces
+	if len(spaces) == 0 {
+		allSpaces, err := d.ListSpaces(nil)
+		if err != nil {
+			return nil, fmt.Errorf("ls spaces: %w", err)
+		}
+		lsSpaces = allSpaces
 	}
 
-	notes, err := d.ListNotes(spaces, sortOpts, pageOpts)
+	notes, err := d.ListNotes(lsSpaces, sortOpts, pageOpts)
 	if err != nil {
 		return nil, fmt.Errorf("db list: %w", err)
 	}
@@ -190,17 +193,6 @@ func printNotesTitle(notes db.Notes, doColor bool) {
 	if doColor {
 		color.NoColor = true
 	}
-}
-
-func getSpaces(d *db.DB) ([]string, error) {
-	if allArg {
-		spaces, err := d.ListSpaces(nil)
-		if err != nil {
-			return nil, err
-		}
-		return spaces, nil
-	}
-	return viper.GetStringSlice(ViperListSpaces), nil
 }
 
 func mapNoteSortColumn(s string) (db.Column, error) {
