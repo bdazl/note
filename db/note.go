@@ -62,6 +62,14 @@ func (n Notes) GetIDs() []int {
 	return out
 }
 
+func (n Notes) GetSpaces() []string {
+	out := make([]string, len(n))
+	for n, note := range n {
+		out[n] = note.Space
+	}
+	return out
+}
+
 // Internal representation of a note
 type dbNote struct {
 	ID         int

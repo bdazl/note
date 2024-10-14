@@ -96,9 +96,9 @@ var (
 		Run:     noteMove,
 	}
 	spacesCmd = &cobra.Command{
-		Use:     "spaces",
+		Use:     "spaces [id...]",
 		Aliases: []string{"spc"},
-		Short:   "Prints all spaces that holds notes",
+		Short:   "Lists all or some spaces",
 		Run:     noteSpaces,
 	}
 	importCmd = &cobra.Command{

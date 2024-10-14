@@ -23,6 +23,7 @@ package cmd
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/bdazl/note/db"
@@ -31,15 +32,52 @@ import (
 
 func noteSpaces(cmd *cobra.Command, args []string) {
 	sortOpts, err := spacesSortOpt()
+	if err != nil {
+		quitError("arg", err)
+	}
+
+	// Parse ids, if argument(s) are supplied
+	var findIds []int
+	if len(args) > 0 {
+		ids, err := parseIds(args)
+		if err != nil {
+			quitError("parse ids", err)
+		}
+
+		findIds = removeDuplicates(ids)
+	}
 
 	d := dbOpen()
 	defer d.Close()
 
-	spaces, err := d.ListSpaces(sortOpts)
-	if err != nil {
-		quitError("db list", err)
+	// Either find spaces linked to notes
+	var spaces []string
+	if len(findIds) > 0 {
+		notes, err := d.GetNotes(findIds)
+		if err != nil {
+			quitError("db get", err)
+		}
+
+		// When we get notes, the order is one-to-one, so we need to manually sort
+		// and remove duplicates.
+		allSpaces := notes.GetSpaces()
+		spaces = removeDuplicates(allSpaces)
+		if descendingArg {
+			sort.Sort(sort.Reverse(sort.StringSlice(spaces)))
+		} else {
+			sort.Strings(spaces)
+		}
+	} else {
+		// Or list all spaces
+		lsSpaces, err := d.ListSpaces(sortOpts)
+		if err != nil {
+			quitError("db list", err)
+		}
+
+		spaces = lsSpaces
 	}
 
+	// Print listed spaces
 	if listArg {
 		for _, space := range spaces {
 			fmt.Println(space)
