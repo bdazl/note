@@ -59,7 +59,7 @@ func (d *DB) GetNotes(ids []int) (Notes, error) {
 	whenChain := whenThenChain(ids)
 	orderBy := fmt.Sprintf("ORDER BY CASE id %v END", whenChain)
 
-	// Construct query from above
+	// Construct query
 	query := fmt.Sprintf(
 		"SELECT %v FROM notes WHERE id IN (%v) %v",
 		allNoteColumns,

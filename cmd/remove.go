@@ -22,29 +22,90 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
 
+const (
+	TrashSpace = ".trash"
+)
+
 func noteRemove(cmd *cobra.Command, args []string) {
-	ids, err := parseIds(args)
-	if err != nil {
-		quitError("parse ids", err)
+	// Either ids are provided or a specific space must be chosen
+	var ids []int
+	if len(args) != 0 {
+		if allInSpaceArg != "" {
+			quit("you must choose either individual notes or --all-in-space")
+		}
+		parsedIds, err := parseIds(args)
+		if err != nil {
+			quitError("parse ids", err)
+		}
+		ids = parsedIds
+	}
+
+	// Add the stupid case check
+	if allInSpaceArg == TrashSpace && !permanentArg {
+		quit("this action does nothing")
 	}
 
 	db := dbOpen()
 	defer db.Close()
 
+	if len(ids) == 0 {
+		// allInSpaceArg is set and no args provided means find all notes in space
+		allNotesInSpace, err := db.ListNotes([]string{allInSpaceArg}, nil, nil)
+		if err != nil {
+			quitError("db list", err)
+		}
+
+		ids = allNotesInSpace.GetIDs()
+	}
+
 	uniqueIds := removeDuplicates(ids)
-	if err := db.RemoveNotes(uniqueIds); err != nil {
-		quitError("db remove", err)
+	if len(uniqueIds) == 0 {
+		fmt.Println("No notes deleted")
+		os.Exit(0)
+	}
+
+	msgEnd := "moved to trash"
+	if permanentArg {
+		if !noConfirmArg {
+			fmt.Printf("WARNING: You are about to permanently remove %v note(s).\n", len(uniqueIds))
+			fmt.Printf("Write 'yes' to confirm permanent delete: ")
+			response := readUserInput()
+			if response != "yes" {
+				os.Exit(2)
+			}
+		}
+
+		if err := db.PermanentRemoveNotes(uniqueIds); err != nil {
+			quitError("db remove", err)
+		}
+		msgEnd = "permanently removed"
+	} else if err := db.MoveNotes(uniqueIds, TrashSpace); err != nil {
+		quitError("db move", err)
 	}
 
 	count := len(uniqueIds)
 	if count == 1 {
-		fmt.Println("Note removed")
+		fmt.Printf("Note %v\n", msgEnd)
 	} else {
-		fmt.Printf("%v notes removed", count)
+		fmt.Printf("%v notes %v\n", count, msgEnd)
 	}
+}
+
+func readUserInput() string {
+	reader := bufio.NewReader(os.Stdin)
+
+	response, err := reader.ReadString('\n')
+	if err != nil {
+		quitError("read string", err)
+	}
+
+	return strings.ToLower(strings.TrimSpace(response))
 }

@@ -25,7 +25,7 @@ import (
 	"fmt"
 )
 
-func (d *DB) RemoveNotes(ids []int) error {
+func (d *DB) PermanentRemoveNotes(ids []int) error {
 	count := len(ids)
 	if count < 1 {
 		return fmt.Errorf("must provide ids")

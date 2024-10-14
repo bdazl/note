@@ -56,7 +56,6 @@ var (
 		Use:     "remove id [id...]",
 		Aliases: []string{"rm", "del"},
 		Short:   "Remove note(s) with id(s)",
-		Args:    cobra.MinimumNArgs(1),
 		Run:     noteRemove,
 	}
 	getCmd = &cobra.Command{
@@ -127,6 +126,11 @@ var (
 	fileArg   string
 	pinnedArg bool
 
+	// Remove arguments
+	allInSpaceArg string
+	noConfirmArg  bool
+	permanentArg  bool
+
 	// List arguments
 	allArg        bool // also used in spaces
 	sortByArg     string
@@ -174,6 +178,11 @@ func init() {
 	_ = addFlags.StringP("space", "s", DefaultSpace, "partitions the note into a space")
 	addFlags.StringVarP(&fileArg, "file", "f", "", "the note is read from file")
 	addFlags.BoolVarP(&pinnedArg, "pinned", "p", false, "pin your note to the top")
+
+	removeFlags := removeCmd.Flags()
+	removeFlags.StringVar(&allInSpaceArg, "all-in-space", "", "remove all notes in this space")
+	removeFlags.BoolVar(&noConfirmArg, "no-confirm", false, "skip confirmation dialog")
+	removeFlags.BoolVar(&permanentArg, "permanent", false, "note is completely removed from the db")
 
 	sortKeys := getSortKeys()
 	sortUsage := fmt.Sprintf("column to sort notes by (%v)", sortKeys)

@@ -21,7 +21,10 @@ THE SOFTWARE.
 */
 package db
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 func (d *DB) ReplaceContent(id int, content string) error {
 	return d.updateRow("UPDATE notes SET content = ? WHERE id = ?", content, id)
@@ -29,6 +32,43 @@ func (d *DB) ReplaceContent(id int, content string) error {
 
 func (d *DB) MoveNote(id int, toSpace string) error {
 	return d.updateRow("UPDATE notes SET space = ? WHERE id = ?", toSpace, id)
+}
+
+func (d *DB) MoveNotes(ids []int, toSpace string) error {
+	count := len(ids)
+	if count < 1 {
+		return fmt.Errorf("require at least one id")
+	}
+
+	// ID slots
+	manyQuestions := repeatString("?", count)
+	bracketQ := strings.Join(manyQuestions, ", ")
+
+	// Construct query
+	query := fmt.Sprintf(
+		"UPDATE notes SET space = ? WHERE id IN (%v)",
+		bracketQ,
+	)
+
+	// Execute
+	execParams := sliceToAny(ids)
+	execParams = prepend(execParams, any(toSpace))
+	result, err := d.db.Exec(query, execParams...)
+	if err != nil {
+		return fmt.Errorf("exec: %w", err)
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("rows: %w", err)
+	}
+
+	// Validate
+	if rows != int64(count) {
+		return fmt.Errorf("only %v out of %v was moved successfully", rows, count)
+	}
+
+	return nil
 }
 
 func (d *DB) PinNotes(ids []int, pinned bool) error {
@@ -42,7 +82,17 @@ func (d *DB) PinNotes(ids []int, pinned bool) error {
 		pinVal = "1"
 	}
 
-	query := fmt.Sprintf("UPDATE notes SET pinned = %v WHERE %v", pinVal, equalOrChain("id", count))
+	// ID slots
+	manyQuestions := repeatString("?", count)
+	bracketQ := strings.Join(manyQuestions, ", ")
+
+	// Construct query
+	query := fmt.Sprintf(
+		"UPDATE notes SET pinned = %v WHERE id IN (%v)",
+		pinVal, bracketQ,
+	)
+
+	// Execute
 	result, err := d.db.Exec(query, sliceToAny(ids)...)
 	if err != nil {
 		return fmt.Errorf("exec: %w", err)
@@ -53,6 +103,7 @@ func (d *DB) PinNotes(ids []int, pinned bool) error {
 		return fmt.Errorf("rows: %w", err)
 	}
 
+	// Validate
 	if rows != int64(count) {
 		return fmt.Errorf("only %v out of %v was pinned successfully", rows, count)
 	}
@@ -76,4 +127,8 @@ func (d *DB) updateRow(query string, args ...any) error {
 	}
 
 	return nil
+}
+
+func prepend[T any](slice []T, element T) []T {
+	return append([]T{element}, slice...)
 }
