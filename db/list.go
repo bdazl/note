@@ -60,8 +60,8 @@ func (s *SortOpts) Check() error {
 	return nil
 }
 
-func (s *SortOpts) orderStr() string {
-	if s.Ascending {
+func orderString(ascending bool) string {
+	if ascending {
 		return "ASC"
 	}
 	return "DESC"
@@ -101,19 +101,27 @@ func (d *DB) ListNotes(spaces []string, sortOpts *SortOpts, pageOpts *PageOpts) 
 		if err := sortOpts.Check(); err != nil {
 			return nil, err
 		}
-		order := sortOpts.orderStr()
+
+		columnOrder := orderString(sortOpts.Ascending)
+		pinnedOrder := orderString(!sortOpts.Ascending)
+
 		sortColumn := string(sortOpts.SortColumn)
-		sortQueryAdd = fmt.Sprintf("ORDER BY pinned DESC, %v %v", sortColumn, order)
+		sortQueryAdd = fmt.Sprintf(
+			"ORDER BY pinned %v, %v %v",
+			pinnedOrder, sortColumn, columnOrder,
+		)
 	}
 	if pageOpts != nil {
 		if err := pageOpts.Check(); err != nil {
 			return nil, err
 		}
+
 		if pageOpts.Limit > 0 {
 			pageQueryAdd = "LIMIT ? OFFSET ?"
 			addParams = append(addParams, pageOpts.Limit)
 			addParams = append(addParams, pageOpts.Offset)
 		}
+
 		limit = pageOpts.Limit
 	}
 	if len(spaces) > 0 {
@@ -143,6 +151,7 @@ func (d *DB) ListNotes(spaces []string, sortOpts *SortOpts, pageOpts *PageOpts) 
 		if err != err {
 			return nil, err
 		}
+
 		notes = append(notes, *note)
 	}
 
@@ -152,7 +161,10 @@ func (d *DB) ListNotes(spaces []string, sortOpts *SortOpts, pageOpts *PageOpts) 
 func (d *DB) ListSpaces(sortOpts *SortOpts) ([]string, error) {
 	orderBy := ""
 	if sortOpts != nil {
-		orderBy = fmt.Sprintf("ORDER BY %v %v", sortOpts.SortColumn, sortOpts.orderStr())
+		orderBy = fmt.Sprintf(
+			"ORDER BY %v %v",
+			sortOpts.SortColumn, orderString(sortOpts.Ascending),
+		)
 	}
 
 	query := fmt.Sprintf("SELECT DISTINCT space FROM notes %v", orderBy)
