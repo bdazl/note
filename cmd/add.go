@@ -53,7 +53,7 @@ func noteAdd(cmd *cobra.Command, args []string) {
 		quitError("db add", err)
 	}
 
-	fmt.Printf("Note created: %v\n", id)
+	fmt.Printf("Created note: %v\n", id)
 }
 
 func produceNote(args []string) string {
