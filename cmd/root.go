@@ -217,7 +217,7 @@ func init() {
 	getFlags.AddFlagSet(printFlagSet)
 
 	spacesFlags := spacesCmd.Flags()
-	spacesFlags.BoolVarP(&allArg, "all", "a", false, "show hidden spaces")
+	//spacesFlags.BoolVarP(&allArg, "all", "a", false, "show hidden spaces")
 	spacesFlags.BoolVarP(&listArg, "list", "l", false, "separate each space with a newline")
 	spacesFlags.BoolVarP(&descendingArg, "descending", "d", false, "descending order")
 
