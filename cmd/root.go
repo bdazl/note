@@ -36,7 +36,7 @@ var (
 	rootCmd = &cobra.Command{
 		Use:   "note",
 		Short: "No fuzz terminal note taking",
-		Run:   noteList,
+		Run:   noteTable,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			currentCmd = cmd
 			initConfig()
@@ -69,6 +69,12 @@ var (
 		Aliases: []string{"ls"},
 		Short:   "Lists notes from one or more spaces",
 		Run:     noteList,
+	}
+	tableCmd = &cobra.Command{
+		Use:     "table [space...]",
+		Aliases: []string{"tbl"},
+		Short:   "Lists available notes in a table format",
+		Run:     noteTable,
 	}
 	editCmd = &cobra.Command{
 		Use:   "edit id",
@@ -140,6 +146,9 @@ var (
 	styleArg      string // also used in get
 	colorArg      string // also used in get
 
+	// Table
+	previewArg uint
+
 	// Spaces arguments
 	listArg bool
 
@@ -201,6 +210,9 @@ func init() {
 	listFlags.AddFlagSet(collectFlagSet)
 	listFlags.AddFlagSet(printFlagSet)
 
+	tableFlags := tableCmd.Flags()
+	tableFlags.UintVarP(&previewArg, "preview", "p", 5, "preview word count to display in table")
+
 	getFlags := getCmd.Flags()
 	getFlags.AddFlagSet(printFlagSet)
 
@@ -236,7 +248,7 @@ func init() {
 	rootCmd.AddCommand(
 		initCmd,
 		addCmd, removeCmd,
-		getCmd, listCmd, spacesCmd,
+		getCmd, listCmd, tableCmd, spacesCmd,
 		editCmd, pinCmd, unpinCmd, moveCmd,
 		importCmd, exportCmd,
 	)

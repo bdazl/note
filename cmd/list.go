@@ -51,6 +51,8 @@ var (
 		"created": db.CreatedColumn,
 		"updated": db.CreatedColumn,
 	}
+
+	Green = color.New(color.FgGreen)
 )
 
 func noteList(cmd *cobra.Command, args []string) {
@@ -157,29 +159,20 @@ func printNotesPlain(notes db.Notes) {
 
 func printNotesTitle(notes db.Notes, doColor bool) {
 	var (
-		green = color.New(color.FgGreen)
-
-		pin     = "\U0001F4CC"
-		boxThin = '\u2500'
-		line    = strings.Repeat(string(boxThin), 4)
+		line = strings.Repeat(BoxH, 4)
 	)
 
-	// fatih/color is (too) smart and disables colors for non-terminal outputs
-	// doColor considers such cases when color is set to 'auto'. If doColor is
-	// true - we should explicitly enable the color
-	if doColor {
-		color.NoColor = false
-	}
+	preColor(doColor)
 
 	for _, n := range notes {
 		pinned := ""
 		if n.Pinned {
-			pinned = pin
+			pinned = Pin
 		}
 		if doColor {
-			green.Printf("%s [", line)
+			Green.Printf("%s [", line)
 			fmt.Printf("%v", n.ID)
-			green.Printf("] %s", line)
+			Green.Printf("] %s", line)
 			fmt.Printf(" %s\n", pinned)
 		} else {
 			fmt.Printf("%s [%v] %s\n", line, n.ID, line)
@@ -190,6 +183,19 @@ func printNotesTitle(notes db.Notes, doColor bool) {
 		fmt.Println(content)
 	}
 
+	postColor(doColor)
+}
+
+func preColor(doColor bool) {
+	// fatih/color is (too) smart and disables colors for non-terminal outputs
+	// doColor considers such cases when color is set to 'auto'. If doColor is
+	// true - we should explicitly enable the color
+	if doColor {
+		color.NoColor = false
+	}
+}
+
+func postColor(doColor bool) {
 	if doColor {
 		color.NoColor = true
 	}
