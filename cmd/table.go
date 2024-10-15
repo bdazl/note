@@ -37,14 +37,14 @@ const (
 )
 
 var (
-	idCol          = "ID"
-	spaceCol       = "Space"
-	pinCol         = "Pin"
-	createdCol     = "Created"
-	lastUpdatedCol = "Last Updated"
-	previewCol     = "Preview"
+	idCol      = "ID"
+	spaceCol   = "Space"
+	pinCol     = "Pin"
+	createdCol = "Created"
+	// lastUpdatedCol = "Updated"
+	previewCol = "Preview"
 
-	tableCols = []string{idCol, spaceCol, pinCol, createdCol, lastUpdatedCol, previewCol}
+	tableCols = []string{idCol, spaceCol, pinCol, createdCol, previewCol}
 )
 
 func noteTable(cmd *cobra.Command, args []string) {
@@ -84,9 +84,9 @@ func printTable(notes db.Notes) {
 			pin = "yes" // Use Pin here, when a unicode-aware tabwriter is implemented
 		}
 		preview := getPreview(note.Content, int(previewArg))
-		fmt.Fprintf(tw, "%v\t%v\t%v\t%v\t%v\t%v\n",
+		fmt.Fprintf(tw, "%v\t%v\t%v\t%v\t%v\n",
 			note.ID, note.Space, pin,
-			note.Created.Format(dateFmt), note.LastUpdate.Format(dateFmt),
+			note.Created.Format(dateFmt),
 			preview,
 		)
 	}

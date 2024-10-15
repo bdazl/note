@@ -211,6 +211,7 @@ func init() {
 	listFlags.AddFlagSet(printFlagSet)
 
 	tableFlags := tableCmd.Flags()
+	tableFlags.AddFlagSet(collectFlagSet)
 	tableFlags.UintVarP(&previewArg, "preview", "p", 5, "preview word count to display in table")
 
 	getFlags := getCmd.Flags()
