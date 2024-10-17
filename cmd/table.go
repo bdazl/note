@@ -34,6 +34,8 @@ import (
 const (
 	Pin  = "📌"
 	BoxH = "─"
+
+	IdeographicSpace = "\u3000"
 )
 
 var (
@@ -79,9 +81,9 @@ func printTable(notes db.Notes) {
 
 	// Print notes
 	for _, note := range notes {
-		pin := "no"
+		pin := IdeographicSpace
 		if note.Pinned {
-			pin = "yes" // Use Pin here, when a unicode-aware tabwriter is implemented
+			pin = Pin
 		}
 		preview := getPreview(note.Content, int(previewArg))
 		fmt.Fprintf(tw, "%v\t%v\t%v\t%v\t%v\n",
