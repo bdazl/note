@@ -41,7 +41,7 @@ const (
 var (
 	idCol      = "ID"
 	spaceCol   = "Space"
-	pinCol     = "Pin"
+	pinCol     = "Pin\u3000"
 	createdCol = "Created"
 	// lastUpdatedCol = "Updated"
 	previewCol = "Preview"
@@ -67,14 +67,6 @@ func printTable(notes db.Notes) {
 	// Print table header
 	for _, col := range tableCols {
 		fmt.Fprintf(tw, "%v\t", col)
-	}
-
-	fmt.Fprintln(tw)
-
-	// Print box outline
-	for _, col := range tableCols {
-		line := strings.Repeat(string(BoxH), len(col))
-		fmt.Fprintf(tw, "%s\t", line)
 	}
 
 	fmt.Fprintln(tw)
