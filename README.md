@@ -11,7 +11,7 @@ To install this program you need the following pre-requisites:
 
 After these are installed, the installation of this program is done by running
 ```bash
-go install github.com/bdazl/note
+go install github.com/bdazl/note@latest
 ```
 
 ## Usage
