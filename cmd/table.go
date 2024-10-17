@@ -46,7 +46,8 @@ var (
 	// lastUpdatedCol = "Updated"
 	previewCol = "Preview"
 
-	tableCols = []string{idCol, spaceCol, pinCol, createdCol, previewCol}
+	allTableCols  = []string{idCol, spaceCol, pinCol, createdCol, previewCol}
+	noPreviewCols = []string{idCol, spaceCol, pinCol, createdCol}
 )
 
 func noteTable(cmd *cobra.Command, args []string) {
@@ -64,8 +65,13 @@ func printTable(notes db.Notes) {
 		dateFmt = "2006-01-02"
 	)
 
+	header := allTableCols
+	if previewArg == 0 {
+		header = noPreviewCols
+	}
+
 	// Print table header
-	for _, col := range tableCols {
+	for _, col := range header {
 		fmt.Fprintf(tw, "%v\t", col)
 	}
 
@@ -77,12 +83,19 @@ func printTable(notes db.Notes) {
 		if note.Pinned {
 			pin = Pin
 		}
-		preview := getPreview(note.Content, int(previewArg))
-		fmt.Fprintf(tw, "%v\t%v\t%v\t%v\t%v\n",
-			note.ID, note.Space, pin,
-			note.Created.Format(dateFmt),
-			preview,
-		)
+		if previewArg == 0 {
+			fmt.Fprintf(tw, "%v\t%v\t%v\t%v\n",
+				note.ID, note.Space, pin,
+				note.Created.Format(dateFmt),
+			)
+		} else {
+			preview := getPreview(note.Content, int(previewArg))
+			fmt.Fprintf(tw, "%v\t%v\t%v\t%v\t%v\n",
+				note.ID, note.Space, pin,
+				note.Created.Format(dateFmt),
+				preview,
+			)
+		}
 	}
 
 	tw.Flush()
