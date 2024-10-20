@@ -33,7 +33,7 @@ import (
 const (
 	ViperDb       = "db"
 	ViperEditor   = "editor"
-	ViperAddSpace = "default_space"
+	ViperAddSpace = "space"
 
 	DefaultSpace = "main"
 )

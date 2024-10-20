@@ -328,7 +328,6 @@ func init() {
 	getFlags.AddFlagSet(printFlagSet)
 
 	spacesFlags := spacesCmd.Flags()
-	//spacesFlags.BoolVarP(&allArg, "all", "a", false, "show hidden spaces")
 	spacesFlags.BoolVarP(&listArg, "list", "l", false, "separate each space with a newline")
 	spacesFlags.BoolVarP(&descendingArg, "descending", "d", false, "descending order")
 
@@ -352,9 +351,8 @@ func init() {
 	exportFlags.IntVarP(&yamlSpacesArg, "yaml-spaces", "P", 4, "YAML spaces encoding option")
 
 	// These variables can exist in the config file or as environment variables as well
-	viper.BindPFlag("db", globalFlags.Lookup("db"))
-	viper.BindPFlag("add_space", addFlags.Lookup("space"))
-	viper.BindPFlag("ls_spaces", listFlags.Lookup("spaces"))
+	viper.BindPFlag(ViperDb, globalFlags.Lookup("db"))
+	viper.BindPFlag(ViperAddSpace, addFlags.Lookup("space"))
 
 	rootCmd.AddCommand(
 		initCmd,
