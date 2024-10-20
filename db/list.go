@@ -124,8 +124,11 @@ func (d *DB) ListNotes(spaces []string, sortOpts *SortOpts, pageOpts *PageOpts) 
 
 		limit = pageOpts.Limit
 	}
-	if len(spaces) > 0 {
-		spaceQueryAdd = spacesWhere(len(spaces))
+	if len(spaces) > 0 { // Spaces slots
+		manyQuestions := repeatString("?", len(spaces))
+		bracketQ := strings.Join(manyQuestions, ", ")
+
+		spaceQueryAdd = fmt.Sprintf("WHERE space IN (%v)", bracketQ)
 		for _, space := range spaces {
 			addParams = append(addParams, space)
 		}
@@ -184,13 +187,6 @@ func (d *DB) ListSpaces(sortOpts *SortOpts) ([]string, error) {
 		spaces = append(spaces, space)
 	}
 	return spaces, nil
-}
-
-func spacesWhere(count int) string {
-	if count < 1 {
-		return ""
-	}
-	return fmt.Sprintf("WHERE %v", equalOrChain("space", count))
 }
 
 func equalOrChain(lhs string, count int) string {
