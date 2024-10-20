@@ -41,40 +41,135 @@ var (
 			currentCmd = cmd
 			initConfig()
 		},
+		Long: `A command line note taking app, to store your short form notes.
+
+The program is designed to be quickly used to jot down text into notes, similar
+to a bulletin board. Hence, notes does not have names, but rather they are
+identified by an ID. Some organization is often desired, however, and so a note
+is also placed in a so-called space. A note can only be in one space at a time,
+but it's possible to move them them.
+
+To start using note, run the 'note init' command, to initialize a configuration
+and database file.
+
+Notes can be pinned, which means that they will always be placed at the top -
+or bottom - depending on the sort order. Pin or unpin with 'note pin' and
+'note unpin' respectively.
+
+Running note without any arguments is the same as the sub command 'note table',
+listing all your notes in a table format. Some sub commands has short form
+aliases. Like 'note ls', which is short for 'note list', or 'note rm' - short for
+'note remove'. For information about specific sub commands, use the '--help' or
+'-h' option. For example: 'note export -h'.`,
 	}
 	initCmd = &cobra.Command{
 		Use:   "init",
-		Short: "Initialize note configuration",
+		Short: "Initialize note configuration and database",
 		Run:   noteInit,
+		Long: `Use this to create an initial configuration and database file.
+
+The configuration file holds default values, to make some operations less tedious.
+All values in the configuration file can be overridden by command line arguments.
+
+The database is a sqlite3 file with a very simple schema. This is used to store
+your notes and is used in every operation. The location of this file can at any
+time be altered in your configuration file. If you want to re-create the database,
+you must first remove (or change location) of the file, and then run 'note init'
+again.`,
 	}
 	addCmd = &cobra.Command{
-		Use:   "add [notes...]",
+		Use:   "add [note...]",
 		Short: "Add new note",
 		Run:   noteAdd,
+		Long: `The add sub-command has three distinct ways to create new notes.
+
+The simplest form of this command is to simply run 'note add', without arguments.
+This will open up the editor of your choice; as specified in either the
+configuration file, by command line argument, or by the environemnt variable
+$EDITOR. Empty notes will be rejected.
+
+The second way to add new notes is to word them out as argument(s), like so:
+'note add These Arguments Becomes Content'. The arguments will be joined with
+spaces, to resemble how they were input: "These Arguments Becomes Content".
+
+The final way to create notes is by specifying a file, that will be read by note.
+This file can be a text file or the special character '-', indicating standard
+input.`,
 	}
 	removeCmd = &cobra.Command{
 		Use:     "remove id [id...]",
 		Aliases: []string{"rm", "del"},
 		Short:   "Remove note(s) with id(s)",
 		Run:     noteRemove,
+		Long: `Remove one or many notes, by their respective ID's.
+
+Removal is by default an operation that moves the notes to the space '.trash'.
+To remove notes permanently you need to specify the '--permanent' flag. It is
+possible to remove all notes in a space, by specifying the '--all-in-space'
+argument, followed by the space you want to empty.`,
 	}
 	getCmd = &cobra.Command{
 		Use:   "get id [id...]",
 		Short: "Get specific note(s)",
 		Args:  cobra.MinimumNArgs(1),
 		Run:   noteGet,
+		Long: `Print the contents of one or more note ID's.
+
+The order of the notes will be the same as the input order.
+For style and coloring options, see 'note list -h'.`,
 	}
 	listCmd = &cobra.Command{
 		Use:     "list [space...]",
 		Aliases: []string{"ls"},
 		Short:   "Lists notes from one or more spaces",
 		Run:     noteList,
+		Long: `All the notes content in the input spaces will be output.
+
+If no spaces are given, all your notes will be printed.
+
+Sort options:
+The --sort, or -S option determines the main sort column. The pinned
+notes will always be the first when the order is ascending and last
+when the order is descending. Reverse the print order by using the -d or
+--descending argument. Available sort columns are:
+* id (default)
+* created (time)
+* updated (last updated time)
+* space
+* content
+
+The limit and offset options can be used to limit the amount of printed
+notes and the offset determines the starting note to print. This can be
+used to paginate the output.
+
+Style options:
+There are at present two styles: raw, light and full.
+The raw style is meant to be showing only the most essential output.
+When used with the 'note list' sub command, it will only print the content
+of your notes. The light option will show you some context and the full
+option will show everything.
+
+Color options: auto, no or never, yes or always.
+auto means that note will default to colors, if stdout is not connected
+with a pipe or similar. To force color use the always, or equivalently
+the yes option. The option never, or equivalently no, means never show
+text in color.`,
 	}
 	tableCmd = &cobra.Command{
 		Use:     "table [space...]",
 		Aliases: []string{"tbl"},
 		Short:   "Lists available notes in a table format",
 		Run:     noteTable,
+		Long: `Print a table of notes with their properties
+
+If no spaces are input, notes from all spaces will be included.
+
+The --preview, or -p option is an integera count; used to determine how
+many preview words will be shown of the content in the notes.
+If 0 is chosen, preview is disabled. If the note is in binary format
+a word is defined as 5 characters.
+
+Sort options can be found by running: 'note list -h'`,
 	}
 	editCmd = &cobra.Command{
 		Use:   "edit id",
@@ -95,9 +190,9 @@ var (
 		Run:   noteUnpin,
 	}
 	moveCmd = &cobra.Command{
-		Use:     "move id toSpace",
+		Use:     "move id space",
 		Aliases: []string{"mv"},
-		Short:   "Move note to other space",
+		Short:   "Move note to another space",
 		Args:    cobra.MinimumNArgs(2),
 		Run:     noteMove,
 	}
@@ -106,6 +201,11 @@ var (
 		Aliases: []string{"spc"},
 		Short:   "Lists all or some spaces",
 		Run:     noteSpaces,
+		Long: `Print the available spaces.
+
+If no ID's are given, all spaces will be printed.
+By specifying ID's of notes, only the spaces occupied by those notes
+will be shown.`,
 	}
 	importCmd = &cobra.Command{
 		Use:     "import file [file...]",
@@ -113,6 +213,16 @@ var (
 		Short:   "Import notes from JSON or YAML file",
 		Args:    cobra.MinimumNArgs(1),
 		Run:     noteImport,
+		Long: `Import many notes from a JSON or YAML file.
+
+The top level is a list and each item is an object containg the following fields:
+* content - string (required)
+* space - string (optional; if not specified)
+* created - date string (optional; if not specified, current time is chosen)
+* last_updated - date string (optional; if not specified, current time is chosen)
+* pinned - bool (optional; default: false)
+
+Files will only be imported once (per run), no checks for duplicate notes are made.`,
 	}
 	exportCmd = &cobra.Command{
 		Use:     "export",
