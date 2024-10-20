@@ -324,7 +324,7 @@ func init() {
 	collectFlagSet.BoolVarP(&descendingArg, "descending", "d", false, "descending order")
 
 	printFlagSet := pflag.NewFlagSet("print", pflag.ExitOnError)
-	printFlagSet.StringVar(&styleArg, "style", string(TitleStyle), "output style (plain, title)")
+	printFlagSet.StringVar(&styleArg, "style", string(LightStyle), "output style (raw, light, full)")
 	printFlagSet.StringVar(&colorArg, "color", "auto", "color option (auto, no|never, yes|always)")
 
 	listFlags := listCmd.Flags()

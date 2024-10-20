@@ -35,8 +35,9 @@ type Color string
 type Style string
 
 const (
-	PlainStyle Style = "plain"
-	TitleStyle Style = "title"
+	RawStyle   Style = "raw"
+	LightStyle Style = "light"
+	FullStyle  Style = "full"
 
 	AutoColor   Color = "auto"
 	NeverColor  Color = "never"
@@ -74,11 +75,11 @@ func styleColorOpts() (Style, bool, error) {
 		style   Style
 		doColor bool
 	)
-	switch styleArg {
-	case string(PlainStyle):
-		style = PlainStyle
-	case string(TitleStyle):
-		style = TitleStyle
+
+	stylized := Style(styleArg)
+	switch stylized {
+	case RawStyle, LightStyle, FullStyle:
+		style = stylized
 	default:
 		return "", false, fmt.Errorf("unrecognized style")
 	}
@@ -144,20 +145,23 @@ func listOpts() (*db.SortOpts, *db.PageOpts, error) {
 
 func pprintNotes(notes db.Notes, style Style, doColor bool) {
 	switch style {
-	case PlainStyle:
-		printNotesPlain(notes)
-	case TitleStyle:
-		printNotesTitle(notes, doColor)
+	case RawStyle:
+		printNotesRaw(notes)
+	case LightStyle:
+		printNotesLight(notes, doColor)
+	case FullStyle:
+		printNotesFull(notes, doColor)
 	}
 }
 
-func printNotesPlain(notes db.Notes) {
+func printNotesRaw(notes db.Notes) {
 	for _, n := range notes {
-		fmt.Printf(n.Content)
+		content := strings.TrimRight(n.Content, "\n")
+		fmt.Println(content)
 	}
 }
 
-func printNotesTitle(notes db.Notes, doColor bool) {
+func printNotesLight(notes db.Notes, doColor bool) {
 	var (
 		line = strings.Repeat(BoxH, 4)
 	)
@@ -178,9 +182,42 @@ func printNotesTitle(notes db.Notes, doColor bool) {
 			fmt.Printf("%s [%v] %s\n", line, n.ID, line)
 		}
 
-		// TODO: Why is a newline added?
 		content := strings.TrimRight(n.Content, "\n")
 		fmt.Println(content)
+	}
+
+	postColor(doColor)
+}
+
+func printNotesFull(notes db.Notes, doColor bool) {
+	fullFmt := "2006-01-02 15:04:05"
+	preColor(doColor)
+
+	for _, n := range notes {
+		created := n.Created.Format(fullFmt)
+		updated := n.LastUpdated.Format(fullFmt)
+		pinned := "no"
+		if n.Pinned {
+			pinned = "yes"
+		}
+		if doColor {
+			Green.Printf("ID: ")
+			fmt.Printf("%v\n", n.ID)
+			Green.Printf("Pinned: ")
+			fmt.Printf("%v\n", pinned)
+			Green.Printf("Space: ")
+			fmt.Printf("%v\n", n.Space)
+			Green.Printf("Created: ")
+			fmt.Printf("%v\n", created)
+			Green.Printf("Last Updated: ")
+			fmt.Printf("%v\n", updated)
+			Green.Printf("Content:\n")
+			fmt.Printf("%v\n", n.Content)
+		} else {
+			fmt.Printf(
+				"ID: %v\nPinned: %v\nSpace: %v\nCreated: %v\nLast Updated: %v\nContent:\n%v\n",
+				n.ID, pinned, n.Space, created, updated, n.Content)
+		}
 	}
 
 	postColor(doColor)
