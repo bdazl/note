@@ -28,13 +28,14 @@ Available Commands:
   export      Export notes to JSON or YAML file
   get         Get specific note(s)
   help        Help about any command
+  id          Lists all or some IDs
   import      Import notes from JSON or YAML file
-  init        Initialize note configuration
+  init        Initialize note configuration and database
   list        Lists notes from one or more spaces
-  move        Move note to other space
+  move        Move note to another space
   pin         Pin note(s) to top
   remove      Remove note(s) with id(s)
-  spaces      Lists all or some spaces
+  space       Lists all or some spaces
   table       Lists available notes in a table format
   unpin       Unpin note(s) from top
 ```
@@ -96,11 +97,17 @@ note add -s MySpace This is a Song
 By default, your notes will fall into the `main` space. You can list all spaces occupied with one or
 more notes, by running:
 ```bash
-note spaces [id...]
+note space [id...]
 ```
 
 If you specify one (or more) id:s in the above command, only spaces occupied by the notes you specify will
 be shown. You can also use the alias `note spc [ids...]` which is equivalent to the previous statement.
+
+To list IDs occupied by a space, you can use the following command, and similarly to the `space` command
+above, if you specify one or more positional arguments - only ID's in those spaces will be shown
+```bash
+note id [space...]
+```
 
 ### Content of notes
 
@@ -140,7 +147,7 @@ note unpin id [id...]
 
 Move note to space:
 ```bash
-note move id space
+note move space id [id...]
 ```
 
 ## Import/export
