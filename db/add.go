@@ -45,7 +45,7 @@ func (d *DB) AddNote(note Note, full bool) (int64, error) {
 		params = []any{
 			dbN.Space,
 			dbN.Created,
-			dbN.LastUpdate,
+			dbN.LastUpdated,
 			dbN.Content,
 			dbN.Pinned,
 		}

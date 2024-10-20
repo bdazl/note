@@ -32,12 +32,12 @@ const (
 
 var (
 	validSortColumns = map[Column]bool{
-		IDColumn:         true,
-		SpaceColumn:      true,
-		CreatedColumn:    true,
-		LastUpdateColumn: true,
-		ContentColumn:    true,
-		PinnedColumn:     true,
+		IDColumn:          true,
+		SpaceColumn:       true,
+		CreatedColumn:     true,
+		LastUpdatedColumn: true,
+		ContentColumn:     true,
+		PinnedColumn:      true,
 	}
 )
 

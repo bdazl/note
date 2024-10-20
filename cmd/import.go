@@ -110,11 +110,11 @@ func fileNotesToDB(notes []FileNote) db.Notes {
 	out := make(db.Notes, len(notes))
 	for n, note := range notes {
 		out[n] = db.Note{
-			Pinned:     note.Pinned,
-			Space:      note.Space,
-			Content:    note.Content,
-			Created:    note.Created,
-			LastUpdate: note.LastUpdated,
+			Pinned:      note.Pinned,
+			Space:       note.Space,
+			Content:     note.Content,
+			Created:     note.Created,
+			LastUpdated: note.LastUpdated,
 		}
 	}
 	return out

@@ -103,7 +103,7 @@ func convFileNotes(notes db.Notes) []FileNote {
 			Space:       note.Space,
 			Content:     note.Content,
 			Created:     note.Created,
-			LastUpdated: note.LastUpdate,
+			LastUpdated: note.LastUpdated,
 		}
 	}
 	return converted

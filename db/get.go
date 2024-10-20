@@ -103,7 +103,7 @@ func scanNote(scanner Scanner) (*Note, error) {
 		&dbN.ID,
 		&dbN.Space,
 		&dbN.Created,
-		&dbN.LastUpdate,
+		&dbN.LastUpdated,
 		&dbN.Content,
 		&dbN.Pinned,
 	)
