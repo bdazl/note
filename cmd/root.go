@@ -190,7 +190,7 @@ Sort options can be found by running: 'note list -h'`,
 		Run:   noteUnpin,
 	}
 	moveCmd = &cobra.Command{
-		Use:     "move id space",
+		Use:     "move space id [id...]",
 		Aliases: []string{"mv"},
 		Short:   "Move note to another space",
 		Args:    cobra.MinimumNArgs(2),

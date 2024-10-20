@@ -23,13 +23,12 @@ package cmd
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/spf13/cobra"
 )
 
 func noteMove(cmd *cobra.Command, args []string) {
-	id, toSpace, err := checkMove(args)
+	space, ids, err := checkMove(args)
 	if err != nil {
 		quitError("args", err)
 	}
@@ -37,20 +36,26 @@ func noteMove(cmd *cobra.Command, args []string) {
 	db := dbOpen()
 	defer db.Close()
 
-	if err = db.MoveNote(id, toSpace); err != nil {
+	uniqueIds := removeDuplicates(ids)
+	if err = db.MoveNotes(uniqueIds, space); err != nil {
 		quitError("db move", err)
 	}
 
-	fmt.Println("Note modified")
+	noteStr := "note"
+	if len(uniqueIds) > 1 {
+		noteStr = "notes"
+	}
+	fmt.Printf("Modified %s.\n", noteStr)
 }
 
-func checkMove(args []string) (int, string, error) {
-	if len(args) != 2 {
-		return 0, "", fmt.Errorf("requires positional arguments id and toSpace")
+func checkMove(args []string) (string, []int, error) {
+	if len(args) < 2 {
+		return "", nil, fmt.Errorf("requires positional arguments space and id")
 	}
-	id, err := strconv.Atoi(args[0])
+	ids, err := parseIds(args[1:])
 	if err != nil {
-		return 0, "", fmt.Errorf("id parse error: %w", err)
+		return "", nil, err
 	}
-	return id, args[1], nil
+
+	return args[0], ids, nil
 }
