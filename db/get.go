@@ -44,7 +44,7 @@ func (d *DB) GetIDs(spaces []string, ascending bool) ([]int, error) {
 		manyQuestions := repeatString("?", len(spaces))
 		bracketQ := strings.Join(manyQuestions, ", ")
 
-		spacesWhere = fmt.Sprintf("WHERE id IN (%v)", bracketQ)
+		spacesWhere = fmt.Sprintf("WHERE space IN (%v)", bracketQ)
 		params = sliceToAny(spaces)
 	}
 
