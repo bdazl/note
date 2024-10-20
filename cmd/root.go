@@ -241,6 +241,12 @@ Files will only be imported once (per run), no checks for duplicate notes are ma
 		Short:   "Export notes to JSON or YAML file",
 		Run:     noteExport,
 	}
+	versionCmd = &cobra.Command{
+		Use:     "version",
+		Aliases: []string{"ver"},
+		Short:   "Version of this program",
+		Run:     noteVersion,
+	}
 
 	// Global arguments
 	configPathArg  string
@@ -371,6 +377,7 @@ func init() {
 
 	rootCmd.AddCommand(
 		initCmd,
+		versionCmd,
 		addCmd, removeCmd,
 		getCmd, listCmd, tableCmd, idCmd, spaceCmd,
 		editCmd, pinCmd, unpinCmd, moveCmd,
