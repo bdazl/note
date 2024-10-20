@@ -33,6 +33,45 @@ type Scanner interface {
 	Scan(dest ...any) error
 }
 
+func (d *DB) GetIDs(spaces []string, ascending bool) ([]int, error) {
+	var (
+		params      = make([]any, 0)
+		spacesWhere = ""
+		orderBy     = fmt.Sprintf("ORDER BY id %v", orderString(ascending))
+	)
+	if len(spaces) > 0 {
+		// Spaces slots
+		manyQuestions := repeatString("?", len(spaces))
+		bracketQ := strings.Join(manyQuestions, ", ")
+
+		spacesWhere = fmt.Sprintf("WHERE id IN (%v)", bracketQ)
+		params = sliceToAny(spaces)
+	}
+
+	// Query combine
+	query := fmt.Sprintf("SELECT id FROM notes %v %v", spacesWhere, orderBy)
+
+	// Query
+	rows, err := d.db.Query(query, params...)
+	if err != nil {
+		return nil, fmt.Errorf("query error: %w", err)
+	}
+	defer rows.Close()
+
+	ids := make([]int, 0)
+	for rows.Next() {
+		var id int
+		err = rows.Scan(&id)
+		if err != nil {
+			return nil, fmt.Errorf("scan error: %w", err)
+		}
+
+		ids = append(ids, id)
+	}
+
+	return ids, nil
+}
+
 func (d *DB) GetNote(id int) (*Note, error) {
 	query := fmt.Sprintf("SELECT %v FROM notes WHERE id = ?", allNoteColumns)
 	row := d.db.QueryRow(query, id)

@@ -30,7 +30,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func noteSpaces(cmd *cobra.Command, args []string) {
+func noteSpace(cmd *cobra.Command, args []string) {
 	sortOpts, err := spacesSortOpt()
 	if err != nil {
 		quitError("arg", err)

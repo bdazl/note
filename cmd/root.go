@@ -196,12 +196,23 @@ Sort options can be found by running: 'note list -h'`,
 		Args:    cobra.MinimumNArgs(2),
 		Run:     noteMove,
 	}
-	spacesCmd = &cobra.Command{
-		Use:     "spaces [id...]",
-		Aliases: []string{"spc"},
+	idCmd = &cobra.Command{
+		Use:     "id [space...]",
+		Aliases: []string{"ids"},
+		Short:   "Lists all or some IDs",
+		Run:     noteId,
+		Long: `Print the available IDs of notes.
+
+If no spaces are given, all ID's will be listed.
+By specifying one or more spaces, only the ID's occupied by those notes
+will be shown.`,
+	}
+	spaceCmd = &cobra.Command{
+		Use:     "space [id...]",
+		Aliases: []string{"spaces", "spc"},
 		Short:   "Lists all or some spaces",
-		Run:     noteSpaces,
-		Long: `Print the available spaces.
+		Run:     noteSpace,
+		Long: `Print available spaces occupied by notes.
 
 If no ID's are given, all spaces will be printed.
 By specifying ID's of notes, only the spaces occupied by those notes
@@ -327,9 +338,13 @@ func init() {
 	getFlags := getCmd.Flags()
 	getFlags.AddFlagSet(printFlagSet)
 
-	spacesFlags := spacesCmd.Flags()
-	spacesFlags.BoolVarP(&listArg, "list", "l", false, "separate each space with a newline")
-	spacesFlags.BoolVarP(&descendingArg, "descending", "d", false, "descending order")
+	idFlags := idCmd.Flags()
+	idFlags.BoolVarP(&listArg, "list", "l", false, "separate each ID with a newline")
+	idFlags.BoolVarP(&descendingArg, "descending", "d", false, "descending order")
+
+	spaceFlags := spaceCmd.Flags()
+	spaceFlags.BoolVarP(&listArg, "list", "l", false, "separate each space with a newline")
+	spaceFlags.BoolVarP(&descendingArg, "descending", "d", false, "descending order")
 
 	inoutFlagSet := pflag.NewFlagSet("inout", pflag.ExitOnError)
 	inoutFlagSet.BoolVarP(&jsonArg, "json", "j", false, "JSON format")
@@ -357,7 +372,7 @@ func init() {
 	rootCmd.AddCommand(
 		initCmd,
 		addCmd, removeCmd,
-		getCmd, listCmd, tableCmd, spacesCmd,
+		getCmd, listCmd, tableCmd, idCmd, spaceCmd,
 		editCmd, pinCmd, unpinCmd, moveCmd,
 		importCmd, exportCmd,
 	)
