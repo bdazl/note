@@ -70,32 +70,6 @@ func noteList(cmd *cobra.Command, args []string) {
 	pprintNotes(notes, style, color)
 }
 
-func styleColorOpts() (Style, bool, error) {
-	var (
-		style   Style
-		doColor bool
-	)
-
-	stylized := Style(styleArg)
-	switch stylized {
-	case RawStyle, LightStyle, FullStyle:
-		style = stylized
-	default:
-		return "", false, fmt.Errorf("unrecognized style")
-	}
-
-	switch colorArg {
-	case "auto":
-		doColor = !color.NoColor
-	case "yes", "always":
-		doColor = true
-	case "no", "never":
-		doColor = false
-	}
-
-	return style, doColor, nil
-}
-
 func collectNotes(spaces []string) (db.Notes, error) {
 	sortOpts, pageOpts, err := listOpts()
 	if err != nil {

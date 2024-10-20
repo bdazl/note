@@ -264,8 +264,6 @@ Files will only be imported once (per run), no checks for duplicate notes are ma
 	descendingArg bool
 	limitArg      int
 	offsetArg     int
-	styleArg      string // also used in get
-	colorArg      string // also used in get
 
 	// Table
 	previewArg uint
@@ -324,8 +322,8 @@ func init() {
 	collectFlagSet.BoolVarP(&descendingArg, "descending", "d", false, "descending order")
 
 	printFlagSet := pflag.NewFlagSet("print", pflag.ExitOnError)
-	printFlagSet.StringVar(&styleArg, "style", string(LightStyle), "output style (raw, light, full)")
-	printFlagSet.StringVar(&colorArg, "color", "auto", "color option (auto, no|never, yes|always)")
+	_ = printFlagSet.String("style", string(LightStyle), "output style (raw, light, full)")
+	_ = printFlagSet.String("color", "auto", "color option (auto, no|never, yes|always)")
 
 	listFlags := listCmd.Flags()
 	listFlags.AddFlagSet(collectFlagSet)
@@ -368,6 +366,8 @@ func init() {
 	// These variables can exist in the config file or as environment variables as well
 	viper.BindPFlag(ViperDb, globalFlags.Lookup("db"))
 	viper.BindPFlag(ViperAddSpace, addFlags.Lookup("space"))
+	viper.BindPFlag(ViperStyle, printFlagSet.Lookup("style"))
+	viper.BindPFlag(ViperColor, printFlagSet.Lookup("color"))
 
 	rootCmd.AddCommand(
 		initCmd,

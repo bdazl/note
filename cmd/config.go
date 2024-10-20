@@ -27,6 +27,7 @@ import (
 	"runtime"
 
 	"github.com/bdazl/note/db"
+	"github.com/fatih/color"
 	"github.com/spf13/viper"
 )
 
@@ -34,6 +35,8 @@ const (
 	ViperDb       = "db"
 	ViperEditor   = "editor"
 	ViperAddSpace = "space"
+	ViperStyle    = "style"
+	ViperColor    = "color"
 
 	DefaultSpace = "main"
 )
@@ -88,7 +91,7 @@ func defaultEditor() string {
 }
 
 func dbFilename() string {
-	return viper.GetString("db")
+	return viper.GetString(ViperDb)
 }
 
 func dbOpen() *db.DB {
@@ -97,4 +100,32 @@ func dbOpen() *db.DB {
 		quitError("db open", err)
 	}
 	return d
+}
+
+func styleColorOpts() (Style, bool, error) {
+	var (
+		style   Style
+		doColor bool
+	)
+
+	styleStr := viper.GetString(ViperStyle)
+	stylized := Style(styleStr)
+	switch stylized {
+	case RawStyle, LightStyle, FullStyle:
+		style = stylized
+	default:
+		return "", false, fmt.Errorf("unrecognized style")
+	}
+
+	colorStr := viper.GetString(ViperColor)
+	switch colorStr {
+	case "auto":
+		doColor = !color.NoColor
+	case "yes", "always":
+		doColor = true
+	case "no", "never":
+		doColor = false
+	}
+
+	return style, doColor, nil
 }
