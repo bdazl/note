@@ -188,18 +188,3 @@ func (d *DB) ListSpaces(sortOpts *SortOpts) ([]string, error) {
 	}
 	return spaces, nil
 }
-
-func equalOrChain(lhs string, count int) string {
-	var (
-		bld      = strings.Builder{}
-		orStmt   = " OR "
-		mainStmt = fmt.Sprintf("%v = ?", lhs)
-	)
-	for i := 0; i < count; i++ {
-		if i > 0 {
-			bld.WriteString(orStmt)
-		}
-		bld.WriteString(mainStmt)
-	}
-	return bld.String()
-}

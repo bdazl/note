@@ -23,6 +23,7 @@ package db
 
 import (
 	"fmt"
+	"strings"
 )
 
 func (d *DB) PermanentRemoveNotes(ids []int) error {
@@ -31,7 +32,16 @@ func (d *DB) PermanentRemoveNotes(ids []int) error {
 		return fmt.Errorf("must provide ids")
 	}
 
-	query := fmt.Sprintf("DELETE FROM notes WHERE %v", equalOrChain("id", count))
+	// ID slots
+	manyQuestions := repeatString("?", len(ids))
+	bracketQ := strings.Join(manyQuestions, ", ")
+
+	idsWhere := fmt.Sprintf("id IN (%v)", bracketQ)
+
+	// Combine query
+	query := fmt.Sprintf("DELETE FROM notes WHERE %v", idsWhere)
+
+	// Execute query
 	result, err := d.db.Exec(query, sliceToAny(ids)...)
 	if err != nil {
 		return fmt.Errorf("exec: %w", err)
