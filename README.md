@@ -38,6 +38,7 @@ Available Commands:
   space       Lists all or some spaces
   table       Lists available notes in a table format
   unpin       Unpin note(s) from top
+  version     Version of this program
 ```
 
 ### Init note
