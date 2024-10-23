@@ -32,6 +32,10 @@ import (
 )
 
 const (
+	Linux   = "linux"
+	Darwin  = "darwin"
+	Windows = "windows"
+
 	ViperDb       = "db"
 	ViperEditor   = "editor"
 	ViperAddSpace = "space"
@@ -87,11 +91,11 @@ func cmdPathWantsConfig(cmdPath string) bool {
 
 func defaultEditor() string {
 	switch runtime.GOOS {
-	case "linux":
+	case Linux:
 		return "nano" // it pains me to put this here...
-	case "darwin":
+	case Darwin:
 		return "open -a TextEdit"
-	case "windows":
+	case Windows:
 		return "notepad"
 	default:
 		return "vim"

@@ -90,9 +90,11 @@ func defaultStoragePath() (string, error) {
 // The default directory of configuration files
 func defaultConfigDir() (string, error) {
 	switch runtime.GOOS {
-	case "linux":
+	case Linux:
 		return defaultXdg(xdgConfigHome, defaultConfig)
-	case "windows":
+	case Darwin:
+		return darwinConfig()
+	case Windows:
 		return winLocalAppData()
 	default:
 		return "", fmt.Errorf("can't determine default configuration directory")
@@ -101,9 +103,11 @@ func defaultConfigDir() (string, error) {
 
 func defaultDataDir() (string, error) {
 	switch runtime.GOOS {
-	case "linux":
+	case Linux:
 		return defaultXdg(xdgDataHome, defaultData)
-	case "windows":
+	case Darwin:
+		return darwinCache()
+	case Windows:
 		return winAppData()
 	default:
 		return "", fmt.Errorf("can't determine default data directory")
@@ -126,6 +130,35 @@ func defaultXdg(env, rel string) (string, error) {
 	// If we got home, we know it's a valid directory
 	// The underlying directory must not necessarily exist yet
 	return filepath.Join(home, rel), nil
+}
+
+func darwinConfig() (string, error) {
+	configDir := os.Getenv("XDG_CONFIG_HOME")
+	if configDir != "" {
+		return configDir, nil
+	}
+
+	home, err := homeDir()
+	if err != nil {
+		return "", err
+	}
+
+	return filepath.Join(home, "Library", "Application Support"), nil
+}
+
+func darwinCache() (string, error) {
+	// Under MacOS, we still follow freedesktop, but use more sensible default
+	cacheDir := os.Getenv("XDG_CACHE_HOME")
+	if cacheDir != "" {
+		return cacheDir, nil
+	}
+
+	home, err := homeDir()
+	if err != nil {
+		return "", err
+	}
+
+	return filepath.Join(home, "Library", "Caches"), nil
 }
 
 func winLocalAppData() (string, error) {
