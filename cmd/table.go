@@ -56,6 +56,11 @@ func noteTable(cmd *cobra.Command, args []string) {
 		quitError("collect notes", err)
 	}
 
+	if len(notes) == 0 {
+		// Silently exit, empty db means nothing to print
+		return
+	}
+
 	printTable(notes)
 }
 
