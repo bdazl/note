@@ -106,7 +106,7 @@ func defaultDataDir() (string, error) {
 	case Linux:
 		return defaultXdg(xdgDataHome, defaultData)
 	case Darwin:
-		return darwinCache()
+		return darwinData()
 	case Windows:
 		return winAppData()
 	default:
@@ -133,32 +133,31 @@ func defaultXdg(env, rel string) (string, error) {
 }
 
 func darwinConfig() (string, error) {
-	configDir := os.Getenv("XDG_CONFIG_HOME")
+	// Under MacOS, we still follow freedesktop, but use more sensible default
+	configDir := os.Getenv(xdgConfigHome)
 	if configDir != "" {
 		return configDir, nil
 	}
 
+	return darwinApplicationSupport()
+}
+
+func darwinData() (string, error) {
+	dataDir := os.Getenv(xdgDataHome)
+	if dataDir != "" {
+		return dataDir, nil
+	}
+
+	return darwinApplicationSupport()
+}
+
+func darwinApplicationSupport() (string, error) {
 	home, err := homeDir()
 	if err != nil {
 		return "", err
 	}
 
 	return filepath.Join(home, "Library", "Application Support"), nil
-}
-
-func darwinCache() (string, error) {
-	// Under MacOS, we still follow freedesktop, but use more sensible default
-	cacheDir := os.Getenv("XDG_CACHE_HOME")
-	if cacheDir != "" {
-		return cacheDir, nil
-	}
-
-	home, err := homeDir()
-	if err != nil {
-		return "", err
-	}
-
-	return filepath.Join(home, "Library", "Caches"), nil
 }
 
 func winLocalAppData() (string, error) {
