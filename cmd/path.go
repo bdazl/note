@@ -163,30 +163,30 @@ func darwinCache() (string, error) {
 
 func winLocalAppData() (string, error) {
 	localAppDir := os.Getenv("LOCALAPPDATA")
-	if localAppDir == "" {
-		userProfile, err := winUserProfile()
-		if err != nil {
-			return "", err
-		}
-
-		localAppDir = filepath.Join(userProfile, "AppData", "Local")
+	if localAppDir != "" {
+		return localAppDir, nil
 	}
 
-	return localAppDir, nil
+	userProfile, err := winUserProfile()
+	if err != nil {
+		return "", err
+	}
+
+	return filepath.Join(userProfile, "AppData", "Local"), nil
 }
 
 func winAppData() (string, error) {
 	appData := os.Getenv("APPDATA")
-	if appData == "" {
-		userProfile, err := winUserProfile()
-		if err != nil {
-			return "", err
-		}
-
-		appData = filepath.Join(userProfile, "AppData", "Roaming")
+	if appData != "" {
+		return appData, nil
 	}
 
-	return appData, nil
+	userProfile, err := winUserProfile()
+	if err != nil {
+		return "", err
+	}
+
+	return filepath.Join(userProfile, "AppData", "Roaming"), nil
 }
 
 func winUserProfile() (string, error) {
