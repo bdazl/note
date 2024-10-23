@@ -1,9 +1,12 @@
-.PHONY: build-amd64
+MAKEFILE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+RELEASE_VERSION := $(shell git describe --tag)
 
 # On Arch Linux, the package is extra/mingw-w64-gcc
-win_cc := /usr/bin/x86_64-w64-mingw32-gcc
-module := github.com/bdazl/note
-release_version := $(shell git describe --tag)
+WIN_CC := /usr/bin/x86_64-w64-mingw32-gcc
+MODULE := github.com/bdazl/note
+
+clean:
+	rm -rf $(MAKEFILE_DIR)build
 
 install-prereq:
 	# https://github.com/mattn/go-sqlite3?tab=readme-ov-file#installation
@@ -11,8 +14,8 @@ install-prereq:
 
 build-linux:
 	mkdir -p build/amd64/linux
-	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags="-X '$(module)/cmd.Version=$(release_version)'" -o build/amd64/linux/note
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags="-X '$(MODULE)/cmd.Version=$(RELEASE_VERSION)'" -o build/amd64/linux/note
 
 cross-build-windows:
 	mkdir -p build/amd64/windows
-	CC=$(win_cc) CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -ldflags="-X '$(module)/cmd.Version=$(release_version)'" -o build/amd64/windows/note.exe
+	CC=$(WIN_CC) CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -ldflags="-X '$(MODULE)/cmd.Version=$(RELEASE_VERSION)'" -o build/amd64/windows/note.exe
