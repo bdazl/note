@@ -68,10 +68,20 @@ func initConfig() {
 
 	if err := viper.ReadInConfig(); err != nil {
 		cmdPath := currentCmd.CommandPath()
-		// Only print warning message when we the user is not explicitly trying to create this file
-		if cmdPath != "note init" {
-			fmt.Fprintln(os.Stderr, "Could not read config file, consider running: note init")
+
+		// Only print warning message when the config should be in place
+		if cmdPathWantsConfig(cmdPath) {
+			fmt.Fprintln(os.Stderr, "WARNING: Could not read config file, consider running: note init")
 		}
+	}
+}
+
+func cmdPathWantsConfig(cmdPath string) bool {
+	switch cmdPath {
+	case "note init", "note version":
+		return false
+	default:
+		return true
 	}
 }
 
