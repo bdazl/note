@@ -26,6 +26,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"runtime"
 )
 
 const (
@@ -88,11 +89,25 @@ func defaultStoragePath() (string, error) {
 
 // The default directory of configuration files
 func defaultConfigDir() (string, error) {
-	return defaultXdg(xdgConfigHome, defaultConfig)
+	switch runtime.GOOS {
+	case "linux":
+		return defaultXdg(xdgConfigHome, defaultConfig)
+	case "windows":
+		return winLocalAppData()
+	default:
+		return "", fmt.Errorf("can't determine default configuration directory")
+	}
 }
 
 func defaultDataDir() (string, error) {
-	return defaultXdg(xdgDataHome, defaultData)
+	switch runtime.GOOS {
+	case "linux":
+		return defaultXdg(xdgDataHome, defaultData)
+	case "windows":
+		return winAppData()
+	default:
+		return "", fmt.Errorf("can't determine default data directory")
+	}
 }
 
 func defaultXdg(env, rel string) (string, error) {
@@ -111,6 +126,43 @@ func defaultXdg(env, rel string) (string, error) {
 	// If we got home, we know it's a valid directory
 	// The underlying directory must not necessarily exist yet
 	return filepath.Join(home, rel), nil
+}
+
+func winLocalAppData() (string, error) {
+	localAppDir := os.Getenv("LOCALAPPDATA")
+	if localAppDir == "" {
+		userProfile, err := winUserProfile()
+		if err != nil {
+			return "", err
+		}
+
+		localAppDir = filepath.Join(userProfile, "AppData", "Local")
+	}
+
+	return localAppDir, nil
+}
+
+func winAppData() (string, error) {
+	appData := os.Getenv("APPDATA")
+	if appData == "" {
+		userProfile, err := winUserProfile()
+		if err != nil {
+			return "", err
+		}
+
+		appData = filepath.Join(userProfile, "AppData", "Roaming")
+	}
+
+	return appData, nil
+}
+
+func winUserProfile() (string, error) {
+	userProfile := os.Getenv("USERPROFILE")
+	if userProfile == "" {
+		return "", fmt.Errorf("USERPROFILE not defined")
+	}
+
+	return userProfile, nil
 }
 
 func validFolder(path string) bool {

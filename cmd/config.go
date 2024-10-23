@@ -86,15 +86,13 @@ func cmdPathWantsConfig(cmdPath string) bool {
 }
 
 func defaultEditor() string {
-	switch os := runtime.GOOS; os {
+	switch runtime.GOOS {
 	case "linux":
 		return "nano" // it pains me to put this here...
 	case "darwin":
 		return "open -a TextEdit"
 	case "windows":
 		return "notepad"
-	case "plan9":
-		return "acme"
 	default:
 		return "vim"
 	}
