@@ -12,6 +12,8 @@ install-prereq:
 	# https://github.com/mattn/go-sqlite3?tab=readme-ov-file#installation
 	CGO_ENABLED=1 go install github.com/mattn/go-sqlite3
 
+build-all: build-linux cross-build-windows
+
 build-linux:
 	mkdir -p build/amd64/linux
 	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags="-X '$(MODULE)/cmd.Version=$(RELEASE_VERSION)'" -o build/amd64/linux/note
