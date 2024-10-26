@@ -1,5 +1,5 @@
 MAKEFILE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-RELEASE_VERSION := $(shell git describe --tag)
+RELEASE_VERSION := $(shell git describe --tags --always 2>/dev/null || git rev-parse --short HEAD)
 
 # On Arch Linux, the package is extra/mingw-w64-gcc
 WIN_CC := /usr/bin/x86_64-w64-mingw32-gcc
