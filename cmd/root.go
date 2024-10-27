@@ -146,7 +146,7 @@ input.`,
 		Run:     noteRemove,
 		Long: `Remove one or many notes, by their respective ID's.
 
-Removal is by default an operation that moves the notes to the space '.trash'.
+Removal is by default an operation that moves the notes to the .trash space.
 To remove notes permanently you need to specify the '--permanent' flag. It is
 possible to remove all notes in a space, by specifying the '--all-in-space'
 argument, followed by the space you want to empty.`,
