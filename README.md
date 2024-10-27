@@ -1,10 +1,10 @@
-# note: Minimalistic Note Taking
+# `note`: Minimalistic Note Taking
 
 `note` is designed to help you to quickly jot down text onto a space, similar to a bulletin
 board; in your terminal. Notes are stored in a [sqlite](https://www.sqlite.org/) database
 file and upon creation the note is assigned an *ID*.
 
-In note, all notes are organized into *spaces*. A space is simply a category or label you
+In `note`, all notes are organized into *spaces*. A space is simply a category or label you
 assign to your notes. The space can be any [UTF-8 encoded](https://en.wikipedia.org/wiki/UTF-8)
 string and the only rule is that a space cannot include the comma character: `,`.
 
@@ -24,7 +24,7 @@ Consider using this program if you vibe with some or all of these `note` feature
 composable programs - do one thing well.
 
 
-## Why note
+## Why `note`
 
 There are a couple of contenders to this program. Most alternatives to `note` store their
 notes in text files in the filesystem, with various tricks of organisation. The most feature
