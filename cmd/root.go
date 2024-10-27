@@ -253,13 +253,36 @@ will be shown.`,
 	spaceCmd = &cobra.Command{
 		Use:     "space [id...]",
 		Aliases: []string{"spaces", "spc"},
-		Short:   "Lists all or some spaces",
+		Short:   "Lists available spaces",
 		Run:     noteSpace,
 		Long: `Print available spaces occupied by notes.
 
-If no ID's are given, all spaces will be printed.
+If no ID's are given, all spaces not hidden will be printed.
 By specifying ID's of notes, only the spaces occupied by those notes
 will be shown.`,
+	}
+	findCmd = &cobra.Command{
+		Use:     "find pattern [pattern...]",
+		Aliases: []string{"fd", "grep"},
+		Short:   "Move note to another space",
+		Args:    cobra.MinimumNArgs(1),
+		Run:     noteFind,
+		Long: `Find the note containing the pattern
+
+By default the pattern indicates a case sensitive string to be found.
+Use --insensitive to change to case insensitive match. If --regexp is specified
+the combined pattern is considered a regular expression.
+
+If multiple patterns are input, they will be combined with spaces in between,
+regardless if the pattern is a regexp or not.
+
+When the --all option is set, hidden spaces will be searched excluding .trash.
+If the --trash option is set, the .trash space is included.
+If --trash is set, but not --all, .trash is the only hidden space searched.
+
+The --posix flag restricts the regexp syntax to POSIX ERE (egrep) and the match
+semantics is leftmost-longest. This option implies --regexp
+See: https://pkg.go.dev/regexp#CompilePOSIX for details.`,
 	}
 	importCmd = &cobra.Command{
 		Use:     "import file [file...]",
@@ -309,7 +332,7 @@ Files will only be imported once (per run), no checks for duplicate notes are ma
 	permanentArg  bool
 
 	// List arguments
-	allArg        bool // also used in spaces
+	allArg        bool // used in a lot of places
 	sortByArg     string
 	descendingArg bool
 	limitArg      int
@@ -320,6 +343,13 @@ Files will only be imported once (per run), no checks for duplicate notes are ma
 
 	// Spaces arguments
 	listArg bool
+
+	// Find arguments
+	insensitiveArg bool
+	regexpArg      bool
+	posixArg       bool
+	trashArg       bool
+	idArg          bool
 
 	// Import/Export arguments
 	spacesArg     []string
@@ -393,6 +423,16 @@ func init() {
 	getFlags := getCmd.Flags()
 	getFlags.AddFlagSet(printFlagSet)
 
+	findFlags := findCmd.Flags()
+	findFlags.AddFlagSet(printFlagSet)
+	findFlags.BoolVarP(&allArg, "all", "a", false, "show results from hidden spaces")
+	findFlags.BoolVarP(&trashArg, "trash", "t", false, "show results from trash")
+	findFlags.BoolVar(&idArg, "id", false, "print only IDs of matched notes")
+	findFlags.BoolVarP(&listArg, "list", "l", false, "separate IDs with newline")
+	findFlags.BoolVarP(&insensitiveArg, "insensitive", "i", false, "case insensitive match")
+	findFlags.BoolVarP(&regexpArg, "regexp", "r", false, "pattern is considered regular expressions")
+	findFlags.BoolVarP(&posixArg, "posix", "p", false, "pattern is posix egrep regular expressions (implies --regexp)")
+
 	idFlags := idCmd.Flags()
 	idFlags.BoolVarP(&listArg, "list", "l", false, "separate each ID with a newline")
 	idFlags.BoolVarP(&descendingArg, "descending", "d", false, "descending order")
@@ -430,8 +470,8 @@ func init() {
 	rootCmd.AddCommand(
 		initCmd,
 		versionCmd,
-		addCmd, removeCmd,
-		getCmd, listCmd, tableCmd, idCmd, spaceCmd,
+		addCmd, removeCmd, getCmd, findCmd,
+		listCmd, tableCmd, idCmd, spaceCmd,
 		editCmd, pinCmd, unpinCmd, moveCmd,
 		importCmd, exportCmd,
 	)

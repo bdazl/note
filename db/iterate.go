@@ -19,46 +19,46 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package cmd
+package db
 
-import (
-	"fmt"
-	"strconv"
-	"strings"
+import "fmt"
 
-	"github.com/spf13/cobra"
-)
-
-func noteId(cmd *cobra.Command, args []string) {
-	spaces := removeDuplicates(args)
-
-	db := dbOpen()
-	defer db.Close()
-
-	ids, err := db.GetIDs(spaces, !descendingArg)
-	if err != nil {
-		quitError("db", err)
-	}
-
-	printIds(ids, listArg)
+type NoteIterator struct {
+	Note
+	Err error
 }
 
-func printIds(ids []int, list bool) {
-	if list {
-		for _, id := range ids {
-			fmt.Println(id)
+func (d *DB) IterateNotes(spaces []string, all bool, sortOpts *SortOpts) <-chan NoteIterator {
+	ch := make(chan NoteIterator)
+
+	go func() {
+		defer close(ch)
+
+		page := 0
+		pageOpts := &PageOpts{
+			Limit: 10,
 		}
-	} else {
-		strs := intsToStrings(ids)
-		joined := strings.Join(strs, " ")
-		fmt.Println(joined)
-	}
-}
 
-func intsToStrings(ints []int) []string {
-	out := make([]string, len(ints))
-	for i, val := range ints {
-		out[i] = strconv.Itoa(val)
-	}
-	return out
+		for {
+			notes, err := d.SelectNotes(spaces, all, sortOpts, pageOpts)
+			if err != nil {
+				fmt.Printf("Error: %v", err.Error())
+				ch <- NoteIterator{Err: err}
+				return
+			}
+
+			if len(notes) == 0 {
+				return
+			}
+
+			for _, note := range notes {
+				ch <- NoteIterator{Note: note}
+			}
+
+			page += 1
+			pageOpts.Offset = pageOpts.Limit * page
+		}
+	}()
+
+	return ch
 }
