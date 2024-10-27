@@ -43,17 +43,17 @@ func noteInit(cmd *cobra.Command, args []string) {
 	// the option from the config file.
 	viper.Set("db", dbF)
 
-	mkdir(filepath.Dir(configPathArg))
-	mkdir(filepath.Dir(dbF))
-
-	if !forceArg && exists(configPathArg) {
-		fmt.Fprintln(os.Stderr, "Config file already exists")
-		forceInform = true
-	} else {
-		fmt.Printf("Writing config file: %v\n", configPathArg)
-		err := viper.WriteConfig()
-		if err != nil {
-			quitError("writing config", err)
+	if !dbOnlyArg {
+		if !forceArg && exists(configPathArg) {
+			fmt.Fprintln(os.Stderr, "Config file already exists")
+			forceInform = true
+		} else {
+			mkdir(filepath.Dir(configPathArg))
+			err := viper.WriteConfig()
+			if err != nil {
+				quitError("writing config", err)
+			}
+			fmt.Printf("Wrote config file: %v\n", configPathArg)
 		}
 	}
 
@@ -61,10 +61,11 @@ func noteInit(cmd *cobra.Command, args []string) {
 		fmt.Fprintln(os.Stderr, "Storage file already exists")
 		forceInform = true
 	} else {
-		fmt.Printf("Create initial db: %v\n", dbF)
+		mkdir(filepath.Dir(dbF))
 		if _, err := db.CreateDb(dbF); err != nil {
 			quitError("creating db", err)
 		}
+		fmt.Printf("Created db: %v\n", dbF)
 	}
 
 	if forceInform {

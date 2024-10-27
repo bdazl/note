@@ -296,7 +296,8 @@ Files will only be imported once (per run), no checks for duplicate notes are ma
 	storagePathArg string
 
 	// Init argument
-	forceArg bool
+	dbOnlyArg bool
+	forceArg  bool
 
 	// Add arguments
 	fileArg   string
@@ -364,6 +365,7 @@ func init() {
 	rootFlags.AddFlagSet(selectFlagSet)
 
 	initFlags := initCmd.Flags()
+	initFlags.BoolVar(&dbOnlyArg, "db-only", false, "only initialize a database file")
 	initFlags.BoolVar(&forceArg, "force", false, "determines if existing files will be overwritten")
 
 	addFlags := addCmd.Flags()
