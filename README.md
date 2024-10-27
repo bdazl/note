@@ -69,21 +69,23 @@ operations that can be performed:
 
 | Command    | Description |
 | ---------- | ----------- |
+| init       | Initialize note configuration and database |
 | add        | Add new note |
-| edit       | Edit content of note |
-| export     | Export notes to JSON or YAML file |
 | get        | Get specific note(s) |
-| help       | Help about any command |
+| find       | Find notes containing a pattern |
+| edit       | Edit content of note |
+| pin        | Pin note(s) to top |
+| unpin      | Unpin note(s) from top |
+| move       | Move note to another space |
+| remove     | Remove note(s) with id(s) |
+| clean      | Empty the .trash space |
+| list       | Lists notes from one or more spaces |
+| table      | Lists available notes in a table format |
+| space      | Lists all or some spaces |
 | id         | Lists all or some IDs |
 | import     | Import notes from JSON or YAML file |
-| init       | Initialize note configuration and database |
-| list       | Lists notes from one or more spaces |
-| move       | Move note to another space |
-| pin        | Pin note(s) to top |
-| remove     | Remove note(s) with id(s) |
-| space      | Lists all or some spaces |
-| table      | Lists available notes in a table format |
-| unpin      | Unpin note(s) from top |
+| export     | Export notes to JSON or YAML file |
+| help       | Help about any command |
 | version    | Version of this program |
 | completion | Generate the autocompletion script for the specified shell |
 
