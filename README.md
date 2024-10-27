@@ -1,49 +1,95 @@
-# note
+# note: Minimalistic Note Taking in your Terminal
 
-No fuzz terminal application for quick and simple note taking. 
+`note` is designed to help you to quickly jot down text onto a space, similar to a bulletin
+board; in your terminal. Notes are stored in a [sqlite](https://www.sqlite.org/) database
+file and upon creation the note is assigned an *ID*.
+
+In note, all notes are organized into *spaces*. A space is simply a category or label you
+assign to your notes. The space can be any [UTF-8 encoded](https://en.wikipedia.org/wiki/UTF-8)
+string and the only rule is that a space cannot include the comma character: `,`.
+
+Space starting with the period, `.`, is considered a *hidden space*. Hidden spaces will not
+be shown by default, when printing notes or spaces. Removal of a note is a move operation
+to the *.trash* space, if permanent delete is not explicitly specified.
+
+Besides the ID and space, notes contain only a limited set of metadata. Timestamps
+for when the note was *created*, as well as *last updated*, as well as the *pin* field.
+Pinned notes are organised together at the top or bottom, depending on the sort order, when
+printed in table or list form.
+
+Consider using this program if you vibe with some or all of these `note` features:
+* Note taking in your terminal should be simple and without bloat.
+* All notes are stored in _one database file_, your filesystem will not be cluttered.
+* [The Unix philosophy](https://en.wikipedia.org/wiki/Unix_philosophy) of minimal scope and
+composable programs - do one thing well.
+
+
+## Why note
+
+There are a couple of contenders to this program. Most alternatives to `note` store their
+notes in text files in the filesystem, with various tricks of organisation. The most feature
+complete alternatives I found either [focuses on files](https://github.com/rhysd/notes-cli)
+or had [too many off-topic features](https://github.com/xwmx/nb) like: git repository
+synchronization, encryption, image storage and more.
+
+The goal of `note` is to give you a simple and powerful interface to manage your notes, with
+just enough built in to organize your notes the way you want to, but without the requirement
+of a specific structure. If you want to, you (or your machine) can simply jot down some notes.
+
 
 ## Installation
 
-This is a [Go](https://go.dev) application, and currently there are no pre-packaged binaries.
+You can download one of the pre-built binaries from the [releases](https://github.com/bdazl/note/releases) page.
+At the time of writing, binaries are built for Linux and Windows targets. macOS will be built
+soon.
+
+### Source
+
+This program is written in [Go](https://go.dev), which means building (reading and contributing)
+the source code is simple.
+
 To install this program you need the following pre-requisites:
 1. [Go](https://go.dev/doc/install)
-2. [go-sqlite3](https://github.com/mattn/go-sqlite3?tab=readme-ov-file#installation)
+2. [GCC](https://gcc.gnu.org/wiki/InstallingGCC)
+3. [go-sqlite3](https://github.com/mattn/go-sqlite3?tab=readme-ov-file#installation)
 
-After these are installed, the installation of this program is done by running
+When you have installed Go and GCC, usually with your system package manager, the rest of
+the installation can be done by running the commands below. `CGO_ENABLED=1` is specified
+because go-sqlite3 requires GCC.
 ```bash
+CGO_ENABLED=1 go install github.com/mattn/go-sqlite3
 go install github.com/bdazl/note@latest
 ```
 
+
 ## Usage
 
-`note` uses [cobra](https://github.com/spf13/cobra) and [viper](https://github.com/spf13/viper)
-to handle command line arguments and configuration. This means that any sub-command that you use
-can be invoked with the `-h` flag, to get information about usage and parameter to that command.
+Below is a snippet output from `note help`, that should give you an overview of the available
+operations that can be performed:
 
-```
-Available Commands:
-  add         Add new note
-  completion  Generate the autocompletion script for the specified shell
-  edit        Edit content of note
-  export      Export notes to JSON or YAML file
-  get         Get specific note(s)
-  help        Help about any command
-  id          Lists all or some IDs
-  import      Import notes from JSON or YAML file
-  init        Initialize note configuration and database
-  list        Lists notes from one or more spaces
-  move        Move note to another space
-  pin         Pin note(s) to top
-  remove      Remove note(s) with id(s)
-  space       Lists all or some spaces
-  table       Lists available notes in a table format
-  unpin       Unpin note(s) from top
-  version     Version of this program
-```
+| Command    | Description |
+| ---------- | ----------- |
+| add        | Add new note |
+| edit       | Edit content of note |
+| export     | Export notes to JSON or YAML file |
+| get        | Get specific note(s) |
+| help       | Help about any command |
+| id         | Lists all or some IDs |
+| import     | Import notes from JSON or YAML file |
+| init       | Initialize note configuration and database |
+| list       | Lists notes from one or more spaces |
+| move       | Move note to another space |
+| pin        | Pin note(s) to top |
+| remove     | Remove note(s) with id(s) |
+| space      | Lists all or some spaces |
+| table      | Lists available notes in a table format |
+| unpin      | Unpin note(s) from top |
+| version    | Version of this program |
+| completion | Generate the autocompletion script for the specified shell |
 
 ### Init note
 
-The first time you use note you need to initialize a configuration and a database. This is done by
+The first time you use `note` you need to initialize a configuration and a database. This is done by
 calling the `init` sub-command:
 ```bash
 note init
@@ -54,21 +100,15 @@ be modified by specifying `-c` and `--db` respectively. These arguments are glob
 and, if specified, will override the config initialized above. The configuration can be a
 [wide array of formats](https://github.com/spf13/viper?tab=readme-ov-file#what-is-viper).
 
-By default the [Freedesktop XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/latest/)
-is used. Mainly `note` looks at the `$XDG_DATA_HOME` and `$XDG_CONFIG_HOME` to determine default directories.
-If these variables are not defined, default values are set according to specification.
+See the [Configuration section](#configuration) for a discussion on where the files are located,
+if default values are used.
 
 ### Add note
 
-There are three main methods of adding your note. The quickest way is to simply invoke note like this:
+There are three main methods of adding your note. The quickest way is to simply invoke `note` like this:
 ```bash
 note add This is My First Note
 note add "This is Another Note"
-```
-
-`note` will respond with an id that you use if you want to modify or access it later:
-```bash
-Created note: 1
 ```
 
 You can write a note with your default `$EDITOR`:
@@ -79,7 +119,7 @@ note add
 If no such editor exist, a default has been chosen for you. It is possible to define the editor in the
 configuration file.
 
-A note can also be created by specifying a file that you want note to read:
+A note can also be created by specifying a file that you want `note` to read:
 ```bash
 note add -f some.txt
 ```
@@ -104,7 +144,7 @@ note space [id...]
 If you specify one (or more) id:s in the above command, only spaces occupied by the notes you specify will
 be shown. You can also use the alias `note spc [ids...]` which is equivalent to the previous statement.
 
-To list IDs occupied by a space, you can use the following command, and similarly to the `space` command
+To list IDs occupied by a space, you can use the following command, and similarly to the space command
 above, if you specify one or more positional arguments - only ID's in those spaces will be shown
 ```bash
 note id [space...]
@@ -151,7 +191,7 @@ Move note to space:
 note move space id [id...]
 ```
 
-## Import/export
+### Import/export
 
 Notes can be exported and imported to [JSON](https://en.wikipedia.org/wiki/JSON) or
 [YAML](https://en.wikipedia.org/wiki/YAML). By default the export is printed to standard output:
@@ -159,10 +199,62 @@ Notes can be exported and imported to [JSON](https://en.wikipedia.org/wiki/JSON)
 note export [file]
 ```
 
+
 ## Configuration
 
-At the moment the configuration file is not that useful, this is in `TODO`-stage at the moment. Use with
-care.
+`note` uses the excellent libraries [cobra](https://github.com/spf13/cobra) and [viper](https://github.com/spf13/viper)
+to handle command line arguments and the configuration file. This is an example of a configuration file:
+```yaml
+db: /home/user/.local/share/note/note.db
+space: main
+editor: vim
+color: auto
+style: light
+```
+
+When using Linux and macOS, the [Freedesktop XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/latest/)
+is used to determine where the configuration and database files are stored, by default. Windows has
+its own set of environment variables and fallback values.If the environment variable is not available
+a fallback value will be used.
+
+Below is a table that tries to illustrate how the different OS default directories are constructed,
+where the `Data` directory is the base directory of the database and `Config` is the base directory
+of the configuration file. Default values will then be `Data/note/note.db` and `Config/note/note.yaml`
+respectively:
+
+| OS | Directory | Environment Variable | Fallback |
+| -- | --------- | -------------------- |--------- |
+| Linux   | Data   | `$XDG_DATA_HOME    | `~/.local/share` |
+| Linux   | Config | `$XDG_CONFIG_HOME` | `~/.config` |
+| macOS   | Data   | `$XDG_DATA_HOME`   | `~/Library/Application Support` |
+| macOS   | Config | `$XDG_CONFIG_HOME` | `~/Library/Application Support` |
+| Windows | Data   | `%APPDATA%`        | `%USERPROFILE%/AppData/Roaming` |
+| Windows | Config | `%LOCALAPPDATA%`   | `%USERPROFILE%/AppData/Local` |
+
+### Environment variables
+These environment variables can be used in all operating systems:
+| Environment variable | Description |
+| -------------------- | ----------- |
+| `DB`     | Database file to use |
+| `EDITOR` | Editor program to use |
+
+### Configuration file parameters
+| Parameter  | Description |
+| ---------- | ----------- |
+| db     | Default database file |
+| space  | Place notes in this space, by default |
+| editor | The editor program to open, when creating or editing new notes |
+| color  | Default color option, one of: `auto`, `no` | `never` or `yes` | `always` |
+| style  | Default style option, one of: `minimal`, `light` or `full`  |
+
+### Precedence
+Some parameters can be specified in file, as environment variables and as command line arguments.
+The precedence for these are in the (reverse) order you just read: if you supply the `DB` environment
+and the `--db` command line parameter, the command line parameter will be used. This means that
+running the following command will initialize a database file
+```
+DB=env.db note init --db cmd.db
+```
 
 ## License
 
