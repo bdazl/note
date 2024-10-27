@@ -264,10 +264,10 @@ will be shown.`,
 	findCmd = &cobra.Command{
 		Use:     "find pattern [pattern...]",
 		Aliases: []string{"fd", "grep"},
-		Short:   "Move note to another space",
+		Short:   "Find notes containing a pattern",
 		Args:    cobra.MinimumNArgs(1),
 		Run:     noteFind,
-		Long: `Find the note containing the pattern
+		Long: `Find notes containing a (combined) pattern
 
 By default the pattern indicates a case sensitive string to be found.
 Use --insensitive to change to case insensitive match. If --regexp is specified
