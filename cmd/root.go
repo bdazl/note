@@ -97,7 +97,7 @@ or bottom - depending on the sort order. Pin or unpin with 'note pin' and
 'note unpin' respectively.
 
 Running note without any arguments is the same as the sub command 'note table',
-listing all your notes in a table format. Some sub commands has short form
+listing all your notes in a table format. Some sub commands have short form
 aliases. Like 'note ls', which is short for 'note list', or 'note rm' - short for
 'note remove'. For information about specific sub commands, use the '--help' or
 '-h' option. For example: 'note export -h'.`,
