@@ -51,7 +51,7 @@ var (
 )
 
 func noteTable(cmd *cobra.Command, args []string) {
-	notes, err := collectNotes(args)
+	notes, err := selectNotes(args)
 	if err != nil {
 		quitError("collect notes", err)
 	}

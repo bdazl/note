@@ -348,6 +348,18 @@ func init() {
 	globalFlags.StringVarP(&configPathArg, "config", "c", dfltConfig, "config file")
 	globalFlags.StringVar(&storagePathArg, "db", dfltStore, "database store containing your notes")
 
+	sortKeys := getSortKeys()
+	sortUsage := fmt.Sprintf("column to sort notes by (%v)", sortKeys)
+	selectFlagSet := pflag.NewFlagSet("select", pflag.ExitOnError)
+	selectFlagSet.BoolVarP(&allArg, "all", "a", false, "list notes from hidden spaces")
+	selectFlagSet.StringVarP(&sortByArg, "sort", "S", "id", sortUsage)
+	selectFlagSet.IntVarP(&limitArg, "limit", "l", 0, "limit amount of notes listed, 0 means no limit")
+	selectFlagSet.IntVarP(&offsetArg, "offset", "o", 0, "begin list notes at some offset (only if limit > 0)")
+	selectFlagSet.BoolVarP(&descendingArg, "descending", "d", false, "descending order")
+
+	rootFlags := rootCmd.Flags()
+	rootFlags.AddFlagSet(selectFlagSet)
+
 	initFlags := initCmd.Flags()
 	initFlags.BoolVar(&forceArg, "force", false, "determines if existing files will be overwritten")
 
@@ -361,24 +373,16 @@ func init() {
 	removeFlags.BoolVar(&noConfirmArg, "no-confirm", false, "skip confirmation dialog")
 	removeFlags.BoolVar(&permanentArg, "permanent", false, "note is completely removed from the db")
 
-	sortKeys := getSortKeys()
-	sortUsage := fmt.Sprintf("column to sort notes by (%v)", sortKeys)
-	collectFlagSet := pflag.NewFlagSet("collect", pflag.ExitOnError)
-	collectFlagSet.StringVarP(&sortByArg, "sort", "S", "id", sortUsage)
-	collectFlagSet.IntVarP(&limitArg, "limit", "l", 0, "limit amount of notes listed, 0 means no limit")
-	collectFlagSet.IntVarP(&offsetArg, "offset", "o", 0, "begin list notes at some offset (only if limit > 0)")
-	collectFlagSet.BoolVarP(&descendingArg, "descending", "d", false, "descending order")
-
 	printFlagSet := pflag.NewFlagSet("print", pflag.ExitOnError)
 	_ = printFlagSet.String("style", string(LightStyle), "output style (raw, light, full)")
 	_ = printFlagSet.String("color", "auto", "color option (auto, no|never, yes|always)")
 
 	listFlags := listCmd.Flags()
-	listFlags.AddFlagSet(collectFlagSet)
+	listFlags.AddFlagSet(selectFlagSet)
 	listFlags.AddFlagSet(printFlagSet)
 
 	tableFlags := tableCmd.Flags()
-	tableFlags.AddFlagSet(collectFlagSet)
+	tableFlags.AddFlagSet(selectFlagSet)
 	tableFlags.UintVarP(&previewArg, "preview", "p", 5, "preview word count to display in table")
 
 	getFlags := getCmd.Flags()
@@ -389,6 +393,7 @@ func init() {
 	idFlags.BoolVarP(&descendingArg, "descending", "d", false, "descending order")
 
 	spaceFlags := spaceCmd.Flags()
+	spaceFlags.BoolVarP(&allArg, "all", "a", false, "list hidden spaces")
 	spaceFlags.BoolVarP(&listArg, "list", "l", false, "separate each space with a newline")
 	spaceFlags.BoolVarP(&descendingArg, "descending", "d", false, "descending order")
 
@@ -403,7 +408,7 @@ func init() {
 	importFlags.BoolVar(&forceArg, "force-format", false, importForceUsage)
 
 	exportFlags := exportCmd.Flags()
-	exportFlags.AddFlagSet(collectFlagSet)
+	exportFlags.AddFlagSet(selectFlagSet)
 	exportFlags.AddFlagSet(inoutFlagSet)
 	exportFlags.StringSliceVarP(&spacesArg, "spaces", "s", []string{}, "limit export to notes from space(s)")
 	exportFlags.BoolVar(&forceArg, "force", false, "determines if existing file will be overwritten")

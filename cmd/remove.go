@@ -57,8 +57,8 @@ func noteRemove(cmd *cobra.Command, args []string) {
 	defer db.Close()
 
 	if len(ids) == 0 {
-		// allInSpaceArg is set and no args provided means find all notes in space
-		allNotesInSpace, err := db.ListNotes([]string{allInSpaceArg}, nil, nil)
+		// allInSpaceArg is set and no args provided means find all notes in specific space
+		allNotesInSpace, err := db.SelectNotes([]string{allInSpaceArg}, false, nil, nil)
 		if err != nil {
 			quitError("db list", err)
 		}

@@ -68,8 +68,8 @@ func noteSpace(cmd *cobra.Command, args []string) {
 			sort.Strings(spaces)
 		}
 	} else {
-		// Or list all spaces
-		lsSpaces, err := d.ListSpaces(sortOpts)
+		// Or list all (or at least some) spaces
+		lsSpaces, err := d.SelectSpaces(allArg, sortOpts)
 		if err != nil {
 			quitError("db list", err)
 		}

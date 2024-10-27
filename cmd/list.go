@@ -62,7 +62,7 @@ func noteList(cmd *cobra.Command, args []string) {
 		quitError("args", err)
 	}
 
-	notes, err := collectNotes(args)
+	notes, err := selectNotes(args)
 	if err != nil {
 		quitError("collect notes", err)
 	}
@@ -70,7 +70,7 @@ func noteList(cmd *cobra.Command, args []string) {
 	pprintNotes(notes, style, color)
 }
 
-func collectNotes(spaces []string) (db.Notes, error) {
+func selectNotes(spaces []string) (db.Notes, error) {
 	sortOpts, pageOpts, err := listOpts()
 	if err != nil {
 		return nil, fmt.Errorf("args: %w", err)
@@ -79,16 +79,7 @@ func collectNotes(spaces []string) (db.Notes, error) {
 	d := dbOpen()
 	defer d.Close()
 
-	lsSpaces := spaces
-	if len(spaces) == 0 {
-		allSpaces, err := d.ListSpaces(nil)
-		if err != nil {
-			return nil, fmt.Errorf("ls spaces: %w", err)
-		}
-		lsSpaces = allSpaces
-	}
-
-	notes, err := d.ListNotes(lsSpaces, sortOpts, pageOpts)
+	notes, err := d.SelectNotes(spaces, allArg, sortOpts, pageOpts)
 	if err != nil {
 		return nil, fmt.Errorf("db list: %w", err)
 	}

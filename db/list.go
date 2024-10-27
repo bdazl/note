@@ -88,7 +88,7 @@ func (p *PageOpts) Check() error {
 	return nil
 }
 
-func (d *DB) ListNotes(spaces []string, sortOpts *SortOpts, pageOpts *PageOpts) (Notes, error) {
+func (d *DB) SelectNotes(spaces []string, all bool, sortOpts *SortOpts, pageOpts *PageOpts) (Notes, error) {
 	var (
 		addParams     = []any{}
 		sortQueryAdd  = "ORDER BY pinned DESC" // By default we always sort pinned first
@@ -132,6 +132,10 @@ func (d *DB) ListNotes(spaces []string, sortOpts *SortOpts, pageOpts *PageOpts) 
 		for _, space := range spaces {
 			addParams = append(addParams, space)
 		}
+	} else if !all {
+		// The caller has not specified individual spaces but also wants to hide notes
+		// from spaces starting with '.'
+		spaceQueryAdd = "WHERE space NOT LIKE '.%'"
 	}
 
 	// Prepare the SQL query
@@ -161,8 +165,14 @@ func (d *DB) ListNotes(spaces []string, sortOpts *SortOpts, pageOpts *PageOpts) 
 	return notes, nil
 }
 
-func (d *DB) ListSpaces(sortOpts *SortOpts) ([]string, error) {
-	orderBy := ""
+func (d *DB) SelectSpaces(all bool, sortOpts *SortOpts) ([]string, error) {
+	var (
+		orderBy = ""
+		where   = ""
+	)
+	if !all {
+		where = "WHERE space NOT LIKE '.%'"
+	}
 	if sortOpts != nil {
 		orderBy = fmt.Sprintf(
 			"ORDER BY %v %v",
@@ -170,7 +180,7 @@ func (d *DB) ListSpaces(sortOpts *SortOpts) ([]string, error) {
 		)
 	}
 
-	query := fmt.Sprintf("SELECT DISTINCT space FROM notes %v", orderBy)
+	query := fmt.Sprintf("SELECT DISTINCT space FROM notes %v %v", where, orderBy)
 	rows, err := d.db.Query(query)
 	if err != nil {
 		return nil, fmt.Errorf("query error: %w", err)
