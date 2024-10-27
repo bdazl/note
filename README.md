@@ -14,7 +14,7 @@ to the *.trash* space, if permanent delete is not explicitly specified.
 
 Besides the ID and space, notes contain only a limited set of metadata. Timestamps
 for when the note was *created*, as well as *last updated*, as well as the *pin* field.
-Pinned notes are organised together at the top or bottom, depending on the sort order, when
+Pinned notes are organized together at the top or bottom, depending on the sort order, when
 printed in table or list form.
 
 Consider using this program if you vibe with some or all of these `note` features:
@@ -27,7 +27,7 @@ composable programs - do one thing well.
 ## Why `note`
 
 There are a couple of contenders to this program. Most alternatives to `note` store their
-notes in text files in the filesystem, with various tricks of organisation. The most feature
+notes in text files in the filesystem, with various tricks of organization. The most feature
 complete alternatives I found either [focuses on files](https://github.com/rhysd/notes-cli)
 or had [too many off-topic features](https://github.com/xwmx/nb) like: git repository
 synchronization, encryption, image storage and more.
