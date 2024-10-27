@@ -36,11 +36,11 @@ const (
 	Darwin  = "darwin"
 	Windows = "windows"
 
-	ViperDb       = "db"
-	ViperEditor   = "editor"
-	ViperAddSpace = "space"
-	ViperStyle    = "style"
-	ViperColor    = "color"
+	ViperDb     = "db"
+	ViperEditor = "editor"
+	ViperSpace  = "space"
+	ViperStyle  = "style"
+	ViperColor  = "color"
 
 	DefaultSpace = "main"
 )
@@ -66,7 +66,7 @@ func initConfig() {
 
 	viper.SetDefault(ViperDb, dfltStore)
 	viper.SetDefault(ViperEditor, defaultEditor())
-	viper.SetDefault(ViperAddSpace, DefaultSpace)
+	viper.SetDefault(ViperSpace, DefaultSpace)
 
 	viper.AutomaticEnv()
 

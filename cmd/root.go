@@ -418,7 +418,7 @@ func init() {
 
 	// These variables can exist in the config file or as environment variables as well
 	viper.BindPFlag(ViperDb, globalFlags.Lookup("db"))
-	viper.BindPFlag(ViperAddSpace, addFlags.Lookup("space"))
+	viper.BindPFlag(ViperSpace, addFlags.Lookup("space"))
 	viper.BindPFlag(ViperStyle, printFlagSet.Lookup("style"))
 	viper.BindPFlag(ViperColor, printFlagSet.Lookup("color"))
 

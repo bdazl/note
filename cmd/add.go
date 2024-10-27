@@ -34,13 +34,13 @@ import (
 func noteAdd(cmd *cobra.Command, args []string) {
 	content := produceNote(args)
 
-	space := viper.GetString(ViperAddSpace)
+	space := viper.GetString(ViperSpace)
 	if err := checkSpaceArgument(space); err != nil {
 		quitError("arg", err)
 	}
 
 	add := db.Note{
-		Space:   viper.GetString(ViperAddSpace),
+		Space:   viper.GetString(ViperSpace),
 		Content: content,
 		Pinned:  pinnedArg,
 	}
