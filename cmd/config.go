@@ -123,7 +123,7 @@ func styleColorOpts() (Style, bool, error) {
 	styleStr := viper.GetString(ViperStyle)
 	stylized := Style(styleStr)
 	switch stylized {
-	case RawStyle, LightStyle, FullStyle:
+	case MinimalStyle, LightStyle, FullStyle:
 		style = stylized
 	default:
 		return "", false, fmt.Errorf("unrecognized style")

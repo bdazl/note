@@ -35,9 +35,9 @@ type Color string
 type Style string
 
 const (
-	RawStyle   Style = "raw"
-	LightStyle Style = "light"
-	FullStyle  Style = "full"
+	MinimalStyle Style = "minimal"
+	LightStyle   Style = "light"
+	FullStyle    Style = "full"
 
 	AutoColor   Color = "auto"
 	NeverColor  Color = "never"
@@ -110,8 +110,8 @@ func listOpts() (*db.SortOpts, *db.PageOpts, error) {
 
 func pprintNotes(notes db.Notes, style Style, doColor bool) {
 	switch style {
-	case RawStyle:
-		printNotesRaw(notes)
+	case MinimalStyle:
+		printNotesMinimal(notes)
 	case LightStyle:
 		printNotesLight(notes, doColor)
 	case FullStyle:
@@ -119,7 +119,7 @@ func pprintNotes(notes db.Notes, style Style, doColor bool) {
 	}
 }
 
-func printNotesRaw(notes db.Notes) {
+func printNotesMinimal(notes db.Notes) {
 	for _, n := range notes {
 		content := strings.TrimRight(n.Content, "\n")
 		fmt.Println(content)

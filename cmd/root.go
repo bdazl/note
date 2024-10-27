@@ -183,8 +183,8 @@ notes and the offset determines the starting note to print. This can be
 used to paginate the output.
 
 Style options:
-There are at present two styles: raw, light and full.
-The raw style is meant to be showing only the most essential output.
+There are at present two styles: minimal, light and full.
+The minimal style is meant to be showing only the most essential output.
 When used with the 'note list' sub command, it will only print the content
 of your notes. The light option will show you some context and the full
 option will show everything.
