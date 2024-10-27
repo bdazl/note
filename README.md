@@ -224,7 +224,7 @@ respectively:
 
 | OS | Directory | Environment Variable | Fallback |
 | -- | --------- | -------------------- |--------- |
-| Linux   | Data   | `$XDG_DATA_HOME    | `~/.local/share` |
+| Linux   | Data   | `$XDG_DATA_HOME`    | `~/.local/share` |
 | Linux   | Config | `$XDG_CONFIG_HOME` | `~/.config` |
 | macOS   | Data   | `$XDG_DATA_HOME`   | `~/Library/Application Support` |
 | macOS   | Config | `$XDG_CONFIG_HOME` | `~/Library/Application Support` |
