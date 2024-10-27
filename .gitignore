@@ -26,3 +26,4 @@ go.work.sum
 
 note
 build/
+dist/

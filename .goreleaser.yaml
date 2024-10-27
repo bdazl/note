@@ -1,0 +1,77 @@
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+
+version: 2
+
+builds:
+  - id: note-linux
+    binary: note
+    env:
+      - CGO_ENABLED=1
+      - CC=x86_64-linux-gnu-gcc
+    goarch:
+      - amd64
+    goos:
+      - linux
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X 'github.com/bdazl/note/cmd.Version={{ .Version }}'
+
+  #- id: note-darwin
+  #  binary: note
+  #  env:
+  #    - CGO_ENABLED=1
+  #    - CC=oa64-clang
+  #  goarch:
+  #    - amd64
+  #  goos:
+  #    - darwin
+  #  flags:
+  #    - -trimpath
+  #  ldflags:
+  #    - -s -w -X 'github.com/bdazl/note/cmd.Version={{ .Version }}'
+
+  - id: note-windows
+    binary: note
+    env:
+      - CGO_ENABLED=1
+      - CC=x86_64-w64-mingw32-gcc
+    goarch:
+      - amd64
+    goos:
+      - windows
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X 'github.com/bdazl/note/cmd.Version={{ .Version }}'
+
+archives:
+  - format: tar.gz
+    # this name template makes the OS and Arch compatible with the results of `uname`.
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    # use zip for windows archives
+    format_overrides:
+      - goos: windows
+        format: zip
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+release:
+  github:
+    owner: bdazl
+    name: note
+  prerelease: auto
+  mode: replace
+  draft: false
