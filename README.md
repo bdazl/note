@@ -1,4 +1,4 @@
-# note: Minimalistic Note Taking in your Terminal
+# note: Minimalistic Note Taking
 
 `note` is designed to help you to quickly jot down text onto a space, similar to a bulletin
 board; in your terminal. Notes are stored in a [sqlite](https://www.sqlite.org/) database
