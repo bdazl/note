@@ -151,6 +151,11 @@ To remove notes permanently you need to specify the '--permanent' flag. It is
 possible to remove all notes in a space, by specifying the '--all-in-space'
 argument, followed by the space you want to empty.`,
 	}
+	cleanCmd = &cobra.Command{
+		Use:   "clean",
+		Short: "Empty the .trash space",
+		Run:   noteClean,
+	}
 	getCmd = &cobra.Command{
 		Use:   "get id [id...]",
 		Short: "Get specific note(s)",
@@ -408,6 +413,9 @@ func init() {
 	removeFlags.BoolVar(&noConfirmArg, "no-confirm", false, "skip confirmation dialog")
 	removeFlags.BoolVar(&permanentArg, "permanent", false, "note is completely removed from the db")
 
+	cleanFlags := cleanCmd.Flags()
+	cleanFlags.BoolVar(&noConfirmArg, "no-confirm", false, "skip confirmation dialog")
+
 	printFlagSet := pflag.NewFlagSet("print", pflag.ExitOnError)
 	_ = printFlagSet.String("style", string(LightStyle), "output style (raw, light, full)")
 	_ = printFlagSet.String("color", "auto", "color option (auto, no|never, yes|always)")
@@ -470,8 +478,9 @@ func init() {
 	rootCmd.AddCommand(
 		initCmd,
 		versionCmd,
-		addCmd, removeCmd, getCmd, findCmd,
-		listCmd, tableCmd, idCmd, spaceCmd,
+		addCmd, removeCmd, cleanCmd,
+		getCmd, findCmd, listCmd,
+		tableCmd, idCmd, spaceCmd,
 		editCmd, pinCmd, unpinCmd, moveCmd,
 		importCmd, exportCmd,
 	)
