@@ -251,9 +251,9 @@ These environment variables can be used in all operating systems:
 Some parameters can be specified in file, as environment variables and as command line arguments.
 The precedence for these are in the (reverse) order you just read: if you supply the `DB` environment
 and the `--db` command line parameter, the command line parameter will be used. This means that
-running the following command will initialize a database file
+running the following command will initialize a database file named `cmd.db`:
 ```
-DB=env.db note init --db cmd.db
+DB=env.db note init --db-only --db cmd.db
 ```
 
 ## License
