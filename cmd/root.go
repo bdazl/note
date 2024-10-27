@@ -81,26 +81,29 @@ var (
 			currentCmd = cmd
 			initConfig()
 		},
-		Long: `A command line note taking app, to store your short form notes.
+		Long: `Terminal note taking app, to store your short form notes.
 
-The program is designed to be quickly used to jot down text into notes, similar
-to a bulletin board. Hence, notes does not have names, but rather they are
-identified by an ID. Some organization is often desired, however, and so a note
-is also placed in a so-called space. A note can only be in one space at a time,
-but it's possible to move them them.
+note is designed to help you to quickly jot down text onto a space, similar to a bulletin
+board; in your terminal. Notes are stored in a sqlite database file and upon creation the
+note is assigned an ID.
 
-To start using note, run the 'note init' command, to initialize a configuration
-and database file.
+In note, all notes are organized into spaces. A space is simply a category or label you
+assign to your notes. The space can be any UTF-8 encoded string and the only rule is that
+a space cannot include the comma character: ','.
 
-Notes can be pinned, which means that they will always be placed at the top -
-or bottom - depending on the sort order. Pin or unpin with 'note pin' and
-'note unpin' respectively.
+Space starting with the period, '.', is considered a hidden space. Hidden spaces will not
+be shown by default, when printing notes or spaces. Removal of a note is a move operation
+to the .trash space, if permanent delete is not explicitly specified.
 
-Running note without any arguments is the same as the sub command 'note table',
-listing all your notes in a table format. Some sub commands have short form
-aliases. Like 'note ls', which is short for 'note list', or 'note rm' - short for
-'note remove'. For information about specific sub commands, use the '--help' or
-'-h' option. For example: 'note export -h'.`,
+Besides the ID and space, notes contain only a limited set of metadata. Timestamps
+for when the note was created, as well as last updated, as well as the pin field.
+Pinned notes are organised together at the top or bottom, depending on the sort order,
+when printed in table or list form.
+
+Running note without any arguments is the same as the sub command 'note table', listing
+all your notes in a table format. Some sub commands have short form aliases. Like 'note ls',
+which is short for 'note list', or 'note rm' - short for 'note remove'. For information
+about specific sub commands, use the '--help' or '-h' option. For example: 'note export -h'.`,
 	}
 	initCmd = &cobra.Command{
 		Use:   "init",
