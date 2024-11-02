@@ -248,7 +248,7 @@ These environment variables can be used in all operating systems:
 | db     | Default database file |
 | space  | Place notes in this space, by default |
 | editor | The editor program to open, when creating or editing new notes |
-| color  | Default color option, one of: `auto`, `no` | `never` or `yes` | `always` |
+| color  | Default color option, one of: `auto`, `no` or `never`, `yes` or `always` |
 | style  | Default style option, one of: `minimal`, `light` or `full`  |
 
 ### Precedence
