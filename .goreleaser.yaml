@@ -70,6 +70,7 @@ changelog:
       - "^chore:"
       - "^docs:"
       - "^test:"
+      - "^Revert"
 
 release:
   github:
