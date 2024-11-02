@@ -64,6 +64,8 @@ go install github.com/bdazl/note@latest
 
 ## Usage
 
+![](https://raw.githubusercontent.com/bdazl/note/refs/heads/main/docs/gif/usage.gif)
+
 Below is a snippet output from `note help`, that should give you an overview of the available
 operations that can be performed:
 
