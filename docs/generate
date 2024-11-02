@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -ex
+
+OUT=output
+mkdir -p $OUT
+rm -rf $OUT/*
+
+podman build . -t vhs-img
+
+podman run -d --name tmp --entrypoint '["/bin/sleep", "2"]' vhs-img
+podman cp tmp:/vhs/out/. output/
+podman stop -t 0 tmp
+podman rm tmp
+#for file in $OUT/*.mp4; do
+#    base=$(basename $file .mp4)
+#    out_file=$OUT/$base.gif
+#    ffmpeg -i $file -c:v gif $out_file
+#done
