@@ -159,7 +159,7 @@ argument, followed by the space you want to empty.`,
 	showCmd = &cobra.Command{
 		Use:     "show id <id...>",
 		Aliases: []string{"cat"},
-		Short:   "Show specific note(s)",
+		Short:   "Show content of specific note(s)",
 		Args:    cobra.MinimumNArgs(1),
 		Run:     noteShow,
 		Long: `Print the contents of one or more note ID's.

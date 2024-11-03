@@ -64,7 +64,7 @@ go install github.com/bdazl/note@latest
 
 ## Usage
 
-![](https://raw.githubusercontent.com/bdazl/note/refs/heads/main/docs/gif/usage.gif)
+![](https://raw.githubusercontent.com/bdazl/note/refs/heads/main/docs/gifs/init.gif)
 
 Below is a snippet output from `note help`, that should give you an overview of the available
 operations that can be performed:
@@ -73,7 +73,7 @@ operations that can be performed:
 | ---------- | ----------- |
 | init       | Initialize note configuration and database |
 | add        | Add new note |
-| get        | Get specific note(s) |
+| show       | Show content of specific note(s) |
 | find       | Find notes containing a pattern |
 | edit       | Edit content of note |
 | pin        | Pin note(s) to top |
