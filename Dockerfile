@@ -17,4 +17,4 @@ FROM scratch
 
 COPY --from=builder /app/build/amd64/linux/note /app/note
 
-ENTRYPOINT ["/bin/note"]
+ENTRYPOINT ["/app/note"]

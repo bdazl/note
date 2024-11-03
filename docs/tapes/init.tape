@@ -1,4 +1,4 @@
-Output out/usage.gif
+Output out/init.gif
 
 Require note
 
@@ -36,5 +36,5 @@ Sleep 300ms
 Type "note table" Sleep 400ms Enter
 Sleep 1s
 
-Type "note get 2" Sleep 200ms Enter
+Type "note show 2" Sleep 200ms Enter
 Sleep 4s

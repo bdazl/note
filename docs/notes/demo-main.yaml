@@ -1,0 +1,130 @@
+- id: 1
+  pinned: false
+  space: personal
+  content: Call Simon regarding Christmas
+  created: 2024-11-03T06:27:15Z
+  last_updated: 2024-11-03T06:27:15Z
+- id: 2
+  pinned: false
+  space: personal
+  content: Research laser interferometers
+  created: 2024-11-03T06:28:24Z
+  last_updated: 2024-11-03T06:28:24Z
+- id: 3
+  pinned: false
+  space: personal
+  content: Adjust helmet HUD to SI units
+  created: 2024-11-03T06:33:16Z
+  last_updated: 2024-11-03T06:33:16Z
+- id: 4
+  pinned: false
+  space: work
+  content: Educate sales on the limits of large language models
+  created: 2024-11-03T07:03:09Z
+  last_updated: 2024-11-03T07:03:09Z
+- id: 5
+  pinned: false
+  space: work
+  content: Explain to Karen why we must block certain generated actions to HAL
+  created: 2024-11-03T07:05:35Z
+  last_updated: 2024-11-03T07:05:35Z
+- id: 6
+  pinned: false
+  space: work
+  content: Figure out how Keith made his exploit sentient
+  created: 2024-11-03T07:07:50Z
+  last_updated: 2024-11-03T07:07:50Z
+- id: 7
+  pinned: false
+  space: work
+  content: Design the soul extracting mechanism
+  created: 2024-11-03T07:10:07Z
+  last_updated: 2024-11-03T07:10:07Z
+- id: 8
+  pinned: false
+  space: work
+  content: Make our CEO rich again
+  created: 2024-11-03T07:10:51Z
+  last_updated: 2024-11-03T07:10:51Z
+- id: 9
+  pinned: false
+  space: shopping
+  content: |-
+    Martha's Christmas presents:
+    - Blanket
+    - Jewellery
+    - Private Jet
+  created: 2024-11-03T07:15:38Z
+  last_updated: 2024-11-03T07:15:38Z
+- id: 10
+  pinned: false
+  space: shopping
+  content: |-
+    Louise's Christmas presents:
+    - Tote bag
+    - Message in a bottle
+    - Lego
+    - Croc socks
+  created: 2024-11-03T07:19:58Z
+  last_updated: 2024-11-03T07:19:58Z
+- id: 11
+  pinned: false
+  space: shopping
+  content: |-
+    Mama's Christmas presents:
+    - Barbells
+    - Commodore 64
+    - Synthesizer
+  created: 2024-11-03T07:53:43Z
+  last_updated: 2024-11-03T07:53:43Z
+- id: 12
+  pinned: false
+  space: shopping
+  content: |-
+    Papa's Christmas presents:
+    - Cookbook
+    - Bicycle
+  created: 2024-11-03T07:57:58Z
+  last_updated: 2024-11-03T07:57:58Z
+- id: 13
+  pinned: false
+  space: quotes
+  content: |-
+    Feeling insignificant because the universe is large
+    has exactly the same logic as
+    feeling inadequate for not being a cow.
+    - David Deutsch
+  created: 2024-11-03T08:06:12Z
+  last_updated: 2024-11-03T08:18:21Z
+- id: 14
+  pinned: false
+  space: quotes
+  content: |-
+    Every problem that is interesting is also soluble.
+    - David Deutsch
+  created: 2024-11-03T08:11:35Z
+  last_updated: 2024-11-03T08:18:28Z
+- id: 15
+  pinned: false
+  space: quotes
+  content: |-
+    If you can't program it, it doesn't exist.
+    - David Deutsch
+  created: 2024-11-03T08:12:11Z
+  last_updated: 2024-11-03T08:18:34Z
+- id: 16
+  pinned: false
+  space: quotes
+  content: |-
+    There is no society in human history that ever suffered because its people became too reasonable.
+    - Sam Harris
+  created: 2024-11-03T08:16:05Z
+  last_updated: 2024-11-03T08:18:39Z
+- id: 17
+  pinned: false
+  space: quotes
+  content: |-
+    A wise man proportions his belief to the evidence.
+    - David Hume
+  created: 2024-11-03T08:17:44Z
+  last_updated: 2024-11-03T08:18:44Z

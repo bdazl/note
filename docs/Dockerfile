@@ -5,9 +5,10 @@ RUN apt-get update && \
 
 WORKDIR /vhs
 
-COPY . .
+COPY tapes/. /tapes
+COPY notes/. /notes
 
 # Copy the built binary and documentation files from the builder stage
 COPY --from=note /app/note /bin/note
 
-RUN EDITOR=/bin/vim vhs *.tape
+RUN EDITOR=/bin/vim vhs /tapes/*.tape
