@@ -17,6 +17,7 @@ install-prereq:
 	CGO_ENABLED=1 go install github.com/mattn/go-sqlite3
 
 build-all: build-linux cross-build-windows
+build-all-docker: build-docker build-docker-vhs generate-gifs
 
 build-linux:
 	mkdir -p build/amd64/linux
@@ -26,7 +27,6 @@ build-cross-windows:
 	mkdir -p build/amd64/windows
 	CC=$(WIN_CC) CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -trimpath -ldflags="-s -w -X '$(MODULE)/cmd.Version=$(RELEASE_VERSION)'" -o build/amd64/windows/note.exe
 
-build-docker-all: build-docker build-docker-vhs generate-gifs
 
 build-docker:
 	$(DOCKER) build -t $(DOCKER_IMAGE) $(MAKEFILE_DIR)

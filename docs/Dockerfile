@@ -11,4 +11,7 @@ COPY notes/. /notes
 # Copy the built binary and documentation files from the builder stage
 COPY --from=note /app/note /bin/note
 
-RUN EDITOR=/bin/vim vhs /tapes/*.tape
+RUN export EDITOR=/bin/vim && \
+    for file in /tapes/*.tape; do \
+       vhs $file; \
+    done
