@@ -25,10 +25,11 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/bdazl/note/db"
 	"github.com/spf13/cobra"
 )
 
-func noteGet(cmd *cobra.Command, args []string) {
+func noteShow(cmd *cobra.Command, args []string) {
 	ids, err := parseIds(args)
 	if err != nil {
 		quitError("parse ids", err)
@@ -48,7 +49,31 @@ func noteGet(cmd *cobra.Command, args []string) {
 		quitError("db get", err)
 	}
 
-	pprintNotes(notes, style, color)
+	// Minimal map of notes
+	notesMap := notes.AsMap()
+
+	// Expand user input order here. If she wanted the same id multiple times, she shall have it.
+	notesOrdered := expandNoteIds(notesMap, ids)
+
+	// This command has a special case for when the user requested to get one note
+	// For this case, default to only printing the content of the note.
+	if len(notesOrdered) == 1 && !alwaysStyleArg {
+		printNotesMinimal(notesOrdered)
+	} else {
+		pprintNotes(notesOrdered, style, color)
+	}
+}
+
+func expandNoteIds(noteMap db.NoteMap, ids []int) db.Notes {
+	out := make(db.Notes, len(ids))
+	for i, id := range ids {
+		var ok bool
+		out[i], ok = noteMap[id]
+		if !ok {
+			quit("internal error: mapping non-existing note id")
+		}
+	}
+	return out
 }
 
 func parseIds(args []string) ([]int, error) {

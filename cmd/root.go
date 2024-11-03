@@ -121,7 +121,7 @@ you must first remove (or change location) of the file, and then run 'note init'
 again.`,
 	}
 	addCmd = &cobra.Command{
-		Use:   "add [note...]",
+		Use:   "add <note...>",
 		Short: "Add new note",
 		Run:   noteAdd,
 		Long: `The add sub-command has three distinct ways to create new notes.
@@ -140,7 +140,7 @@ This file can be a text file or the special character '-', indicating standard
 input.`,
 	}
 	removeCmd = &cobra.Command{
-		Use:     "remove id [id...]",
+		Use:     "remove id <id...>",
 		Aliases: []string{"rm", "del"},
 		Short:   "Remove note(s) with id(s)",
 		Run:     noteRemove,
@@ -156,18 +156,22 @@ argument, followed by the space you want to empty.`,
 		Short: "Empty the .trash space",
 		Run:   noteClean,
 	}
-	getCmd = &cobra.Command{
-		Use:   "get id [id...]",
-		Short: "Get specific note(s)",
-		Args:  cobra.MinimumNArgs(1),
-		Run:   noteGet,
+	showCmd = &cobra.Command{
+		Use:     "show id <id...>",
+		Aliases: []string{"cat"},
+		Short:   "Show specific note(s)",
+		Args:    cobra.MinimumNArgs(1),
+		Run:     noteShow,
 		Long: `Print the contents of one or more note ID's.
 
-The order of the notes will be the same as the input order.
+The order of the notes will be the same as the input order. If only one note is
+requested, the style and color options are mute (minimal style per default). This
+can be overridden with the --always-style (-a) option.
+
 For style and coloring options, see 'note list -h'.`,
 	}
 	listCmd = &cobra.Command{
-		Use:     "list [space...]",
+		Use:     "list <space...>",
 		Aliases: []string{"ls"},
 		Short:   "Lists notes from one or more spaces",
 		Run:     noteList,
@@ -204,7 +208,7 @@ the yes option. The option never, or equivalently no, means never show
 text in color.`,
 	}
 	tableCmd = &cobra.Command{
-		Use:     "table [space...]",
+		Use:     "table <space...>",
 		Aliases: []string{"tbl"},
 		Short:   "Lists available notes in a table format",
 		Run:     noteTable,
@@ -226,26 +230,26 @@ Sort options can be found by running: 'note list -h'`,
 		Run:   noteEdit,
 	}
 	pinCmd = &cobra.Command{
-		Use:   "pin id [id...]",
+		Use:   "pin id <id...>",
 		Short: "Pin note(s) to top",
 		Args:  cobra.MinimumNArgs(1),
 		Run:   notePin,
 	}
 	unpinCmd = &cobra.Command{
-		Use:   "unpin id [id...]",
+		Use:   "unpin id <id...>",
 		Short: "Unpin note(s) from top",
 		Args:  cobra.MinimumNArgs(1),
 		Run:   noteUnpin,
 	}
 	moveCmd = &cobra.Command{
-		Use:     "move space id [id...]",
+		Use:     "move space id <id...>",
 		Aliases: []string{"mv"},
 		Short:   "Move note to another space",
 		Args:    cobra.MinimumNArgs(2),
 		Run:     noteMove,
 	}
 	idCmd = &cobra.Command{
-		Use:     "id [space...]",
+		Use:     "id <space...>",
 		Aliases: []string{"ids"},
 		Short:   "Lists all or some IDs",
 		Run:     noteId,
@@ -256,7 +260,7 @@ By specifying one or more spaces, only the ID's occupied by those notes
 will be shown.`,
 	}
 	spaceCmd = &cobra.Command{
-		Use:     "space [id...]",
+		Use:     "space <id...>",
 		Aliases: []string{"spaces", "spc"},
 		Short:   "Lists available spaces",
 		Run:     noteSpace,
@@ -267,7 +271,7 @@ By specifying ID's of notes, only the spaces occupied by those notes
 will be shown.`,
 	}
 	findCmd = &cobra.Command{
-		Use:     "find pattern [pattern...]",
+		Use:     "find pattern <pattern...>",
 		Aliases: []string{"fd", "grep"},
 		Short:   "Find notes containing a pattern",
 		Args:    cobra.MinimumNArgs(1),
@@ -290,7 +294,7 @@ semantics is leftmost-longest. This option implies --regexp
 See: https://pkg.go.dev/regexp#CompilePOSIX for details.`,
 	}
 	importCmd = &cobra.Command{
-		Use:     "import file [file...]",
+		Use:     "import file <file...>",
 		Aliases: []string{"imp"},
 		Short:   "Import notes from JSON or YAML file",
 		Args:    cobra.MinimumNArgs(1),
@@ -335,6 +339,9 @@ Files will only be imported once (per run), no checks for duplicate notes are ma
 	allInSpaceArg string
 	noConfirmArg  bool
 	permanentArg  bool
+
+	// Get arguments
+	alwaysStyleArg bool
 
 	// List arguments
 	allArg        bool // used in a lot of places
@@ -428,8 +435,9 @@ func init() {
 	tableFlags.AddFlagSet(selectFlagSet)
 	tableFlags.UintVarP(&previewArg, "preview", "p", 5, "preview word count to display in table")
 
-	getFlags := getCmd.Flags()
+	getFlags := showCmd.Flags()
 	getFlags.AddFlagSet(printFlagSet)
+	getFlags.BoolVarP(&alwaysStyleArg, "always-style", "a", false, "always decorate with given style options")
 
 	findFlags := findCmd.Flags()
 	findFlags.AddFlagSet(printFlagSet)
@@ -479,7 +487,7 @@ func init() {
 		initCmd,
 		versionCmd,
 		addCmd, removeCmd, cleanCmd,
-		getCmd, findCmd, listCmd,
+		showCmd, findCmd, listCmd,
 		tableCmd, idCmd, spaceCmd,
 		editCmd, pinCmd, unpinCmd, moveCmd,
 		importCmd, exportCmd,

@@ -53,19 +53,28 @@ type Note struct {
 }
 
 type Notes []Note
+type NoteMap map[int]Note
 
-func (n Notes) GetIDs() []int {
-	out := make([]int, len(n))
-	for n, note := range n {
+func (notes Notes) GetIDs() []int {
+	out := make([]int, len(notes))
+	for n, note := range notes {
 		out[n] = note.ID
 	}
 	return out
 }
 
-func (n Notes) GetSpaces() []string {
-	out := make([]string, len(n))
-	for n, note := range n {
+func (notes Notes) GetSpaces() []string {
+	out := make([]string, len(notes))
+	for n, note := range notes {
 		out[n] = note.Space
+	}
+	return out
+}
+
+func (notes Notes) AsMap() NoteMap {
+	out := make(NoteMap, len(notes))
+	for _, note := range notes {
+		out[note.ID] = note
 	}
 	return out
 }
