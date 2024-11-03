@@ -26,6 +26,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -125,5 +126,6 @@ func openInEditor(initText string) (string, error) {
 		return "", fmt.Errorf("empty file")
 	}
 
-	return string(content), nil
+	// The convention of note is to store files without newlines at the end
+	return strings.TrimRight(string(content), "\r\n"), nil
 }
